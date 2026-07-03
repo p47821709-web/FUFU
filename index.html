@@ -8,11 +8,8 @@
   <!-- Google Fonts：衬线标题 + 无衬线正文 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
   
-  <!-- Supabase JS SDK CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
   <style>
     /* ========================
        设计令牌 / CSS Variables
@@ -1252,6 +1249,9 @@
 
   <!-- Toast 容器 -->
   <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Supabase JS SDK CDN（放在 body 底部，不阻塞页面渲染） -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <script>
     /* =====================================================
