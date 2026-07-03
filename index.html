@@ -1276,9 +1276,18 @@
     };
 
     /* =====================================================
-       初始化 Supabase 客户端
+       初始化 Supabase 客户端（安全初始化，避免阻断页面）
        ===================================================== */
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let supabase = null;
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } else {
+        console.warn('Supabase SDK 未加载，云端功能不可用');
+      }
+    } catch (e) {
+      console.warn('Supabase 初始化失败:', e.message);
+    }
 
     /* =====================================================
        DOM 元素
@@ -1459,6 +1468,7 @@
     }
 
     saveTextBtn.addEventListener('click', async () => {
+      if (!supabase) { showToast('Supabase 未连接，无法保存', 'error'); return; }
       const updates = {};
       document.querySelectorAll('.editable-text').forEach(el => {
         const key = el.dataset.key;
@@ -1484,6 +1494,7 @@
     });
 
     resetTextBtn.addEventListener('click', async () => {
+      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
       if (!confirm('确定要恢复默认文字吗？')) return;
       try {
         const rows = Object.entries(DEFAULT_CONTENT).map(([key, value]) => ({ key, value }));
@@ -1502,6 +1513,7 @@
        数据加载：全局文字
        ===================================================== */
     async function loadSiteContent() {
+      if (!supabase) { renderSiteContent(); return; }
       try {
         const { data, error } = await supabase.from(SITE_CONTENT_TABLE).select('*');
         if (error) throw error;
@@ -1529,6 +1541,7 @@
        数据加载：小猫基础信息
        ===================================================== */
     async function loadCatInfo() {
+      if (!supabase) { infoList.innerHTML = '<div style="color:var(--text-light)">Supabase 未连接</div>'; return; }
       try {
         const { data, error } = await supabase.from(CAT_INFO_TABLE).select('*').order('created_at', { ascending: true });
         if (error) throw error;
@@ -1577,6 +1590,7 @@
        数据加载：成长时间线
        ===================================================== */
     async function loadTimeline() {
+      if (!supabase) { timelineList.innerHTML = '<div style="color:var(--text-light);text-align:center;">Supabase 未连接</div>'; return; }
       try {
         const { data, error } = await supabase.from(TIMELINE_TABLE).select('*').order('event_date', { ascending: false });
         if (error) throw error;
@@ -1626,6 +1640,7 @@
        核心：相册（Storage）
        ===================================================== */
     async function loadGallery() {
+      if (!supabase) { galleryGrid.innerHTML = '<div class="gallery-empty">Supabase 未连接，请检查配置。</div>'; return; }
       galleryGrid.innerHTML = '<div class="gallery-loading">正在从云端加载照片…</div>';
       try {
         const { data, error } = await supabase.storage.from(BUCKET_NAME).list('', { sortBy: { column: 'created_at', order: 'desc' } });
@@ -1698,6 +1713,7 @@
     uploadBtn.addEventListener('click', () => fileInput.click());
 
     fileInput.addEventListener('change', async (e) => {
+      if (!supabase) { showToast('Supabase 未连接，无法上传', 'error'); return; }
       const files = Array.from(e.target.files);
       if (files.length === 0) return;
       const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
@@ -1744,6 +1760,7 @@
     });
 
     async function deletePhoto(fileName) {
+      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
       if (!confirm('确定要删除这张照片吗？')) return;
       try {
         const { error } = await supabase.storage.from(BUCKET_NAME).remove([fileName]);
@@ -1804,6 +1821,7 @@
     }
 
     async function saveModal() {
+      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
       try {
         if (modalMode === 'add-info' || modalMode === 'edit-info') {
           const label = document.getElementById('infoLabel').value.trim();
@@ -1844,6 +1862,7 @@
     }
 
     async function deleteCatInfo(id) {
+      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
       if (!confirm('确定要删除这条信息吗？')) return;
       try {
         const { error } = await supabase.from(CAT_INFO_TABLE).delete().eq('id', id);
@@ -1856,6 +1875,7 @@
     }
 
     async function deleteTimeline(id) {
+      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
       if (!confirm('确定要删除这条成长记录吗？')) return;
       try {
         const { error } = await supabase.from(TIMELINE_TABLE).delete().eq('id', id);
