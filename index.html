@@ -1390,12 +1390,12 @@
     }
 
     /* =====================================================
-       管理员模式：连续点击 Logo 3次
+       管理员模式：连续点击 Logo 3次 切换（开/关）
+       备用：键盘 Ctrl+Shift+A 也可切换
        ===================================================== */
     let logoClickCount = 0;
     let logoClickTimer = null;
     logo.addEventListener('click', (e) => {
-      if (isAdmin) return;
       e.preventDefault();
       logoClickCount++;
       if (!logoClickTimer) {
@@ -1408,6 +1408,23 @@
         clearTimeout(logoClickTimer);
         logoClickTimer = null;
         logoClickCount = 0;
+        toggleAdmin();
+      }
+    });
+
+    // 键盘快捷键 Ctrl+Shift+A 切换管理员模式
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        toggleAdmin();
+      }
+    });
+
+    function toggleAdmin() {
+      if (isAdmin) {
+        disableAdminMode();
+        showToast('已退出管理员模式', 'success');
+      } else {
         const pwd = prompt('请输入管理员密码：');
         if (pwd === null) return;
         if (pwd === ADMIN_PASSWORD) {
@@ -1417,7 +1434,7 @@
           showToast('密码错误', 'error');
         }
       }
-    });
+    }
 
     function enableAdminMode() {
       isAdmin = true;
