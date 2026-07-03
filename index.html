@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大福 · DAFU</title>
+  
+  <!-- Google Fonts：衬线标题 + 无衬线正文 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Supabase JS SDK CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <style>
+    /* ========================
+       设计令牌 / CSS Variables
+       ======================== */
+    :root {
+      --bg: #ffffff;
+      --bg-soft: #fdfbf9;
+      --text: #3a3a3a;
+      --text-light: #6e6e6e;
+      --accent: #e8a87c;           /* 低饱和浅橘 */
+      --accent-soft: #f6e2d3;      /* 橘色极淡 tint */
+      --accent-dark: #c97f52;
+      --border: #efe9e4;
+      --shadow: 0 8px 30px rgba(58, 58, 58, 0.06);
+      --shadow-hover: 0 14px 40px rgba(58, 58, 58, 0.1);
+      --radius: 2px;
+      --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --max-width: 1200px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 装饰性小标签文字 */
+    .label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent-dark);
+    }
+
+    /* ========================
+       管理员模式相关样式
+       ======================== */
+    .admin-only {
+      display: none !important;
+    }
+
+    body.admin-mode .admin-only {
+      display: flex !important;
+    }
+
+    body.admin-mode .admin-only.inline {
+      display: inline-flex !important;
+    }
+
+    body.admin-mode .admin-only.block {
+      display: block !important;
+    }
+
+    /* 可编辑文字高亮 */
+    .editable-text {
+      transition: var(--transition);
+      cursor: default;
+    }
+
+    body.text-edit-mode .editable-text {
+      border: 1px dashed var(--accent);
+      background: rgba(232, 168, 124, 0.06);
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius);
+      cursor: text;
+    }
+
+    body.text-edit-mode .editable-text:focus {
+      outline: none;
+      background: rgba(232, 168, 124, 0.12);
+    }
+
+    /* 管理员模式提示条 */
+    .admin-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 99;
+      background: rgba(246, 226, 211, 0.95);
+      backdrop-filter: blur(8px);
+      color: var(--accent-dark);
+      font-size: 0.8rem;
+      padding: 0.5rem 1rem;
+      text-align: center;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    body.admin-mode .admin-bar {
+      transform: translateY(0);
+    }
+
+    body.admin-mode {
+      padding-top: 2rem;
+    }
+
+    /* 底部固定编辑工具栏 */
+    .text-editor-toolbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      z-index: 150;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    body.text-edit-mode .text-editor-toolbar {
+      transform: translateY(0);
+    }
+
+    /* ========================
+       导航栏
+       ======================== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 1.5rem 4vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition);
+    }
+
+    body.admin-mode nav {
+      top: 2rem;
+    }
+
+    nav.scrolled {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+      padding: 1rem 4vw;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-light);
+      font-size: 0.85rem;
+      font-weight: 400;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      padding: 8px;
+      background: none;
+      border: none;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--text);
+      transition: var(--transition);
+    }
+
+    .exit-admin-btn,
+    .edit-text-btn {
+      padding: 0.45rem 1rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.75rem;
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .exit-admin-btn:hover,
+    .edit-text-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    .edit-text-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    /* ========================
+       通用容器与分栏
+       ======================== */
+    section {
+      padding: 8rem 4vw;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    /* ========================
+       Hero 首屏
+       ======================== */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 6rem;
+      background: var(--bg-soft);
+    }
+
+    #hero .split {
+      align-items: center;
+    }
+
+    .hero-text h1 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .hero-text .subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--accent-dark);
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+
+    .hero-text p {
+      color: var(--text-light);
+      max-width: 420px;
+      font-size: 1rem;
+      line-height: 1.9;
+    }
+
+    .hero-img {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: var(--accent-soft);
+      overflow: hidden;
+    }
+
+    .hero-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.8s ease;
+    }
+
+    .hero-img:hover img {
+      transform: scale(1.02);
+    }
+
+    .frame-deco {
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(255,255,255,0.5);
+      pointer-events: none;
+    }
+
+    /* ========================
+       关于板块
+       ======================== */
+    #about {
+      background: var(--bg);
+    }
+
+    .about-text h2 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 400;
+      margin-bottom: 2rem;
+    }
+
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .info-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-dark);
+      min-width: 80px;
+    }
+
+    .info-content {
+      flex: 1;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .info-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 50%;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      color: var(--text-light);
+    }
+
+    .icon-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    .icon-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+    }
+
+    .add-btn {
+      margin-top: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border: 1px dashed var(--border);
+      background: transparent;
+      color: var(--text-light);
+      font-size: 0.8rem;
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: var(--transition);
+    }
+
+    .add-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    .about-img {
+      position: relative;
+      background: var(--bg-soft);
+    }
+
+    .about-img img {
+      width: 100%;
+      display: block;
+      box-shadow: var(--shadow);
+    }
+
+    .about-img::before {
+      content: '';
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 60%;
+      height: 60%;
+      background: var(--accent-soft);
+      z-index: -1;
+    }
+
+    /* ========================
+       相册板块（核心）
+       ======================== */
+    #gallery {
+      background: var(--bg-soft);
+    }
+
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .gallery-header h2 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 400;
+    }
+
+    .upload-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.4rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.8rem;
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: var(--transition);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .upload-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-dark);
+      box-shadow: var(--shadow);
+    }
+
+    .upload-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
+    .upload-progress {
+      width: 120px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .upload-progress .bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.2s ease;
+    }
+
+    /* 图片网格 */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .photo-card {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: var(--bg);
+      padding: 8px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .photo-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-4px);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .photo-card:hover img {
+      transform: scale(1.03);
+    }
+
+    .photo-card .delete-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: var(--transition);
+      z-index: 2;
+    }
+
+    .photo-card:hover .delete-btn {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .delete-btn:hover {
+      background: #fff;
+      color: #c0392b;
+    }
+
+    .delete-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
+    .gallery-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--text-light);
+    }
+
+    .gallery-loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--text-light);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+    }
+
+    /* ========================
+       成长时间线
+       ======================== */
+    #timeline {
+      background: var(--bg);
+    }
+
+    #timeline h2 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 400;
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .timeline-list {
+      position: relative;
+      max-width: 700px;
+      margin: 0 auto;
+      padding-left: 2rem;
+    }
+
+    .timeline-list::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 3rem;
+    }
+
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -1.85rem;
+      top: 0.35rem;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--accent);
+      z-index: 1;
+    }
+
+    .timeline-item.current .timeline-dot {
+      background: var(--accent);
+    }
+
+    .timeline-date {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      color: var(--accent-dark);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+
+    .timeline-title {
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    .timeline-desc {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .timeline-actions {
+      position: absolute;
+      right: 0;
+      top: 0;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* ========================
+       页脚
+       ======================== */
+    footer {
+      background: var(--bg-soft);
+      border-top: 1px solid var(--border);
+      padding: 3rem 4vw;
+      text-align: center;
+    }
+
+    .paw {
+      width: 18px;
+      height: 18px;
+      margin: 0 auto 0.8rem;
+      opacity: 0.5;
+    }
+
+    footer p {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      font-family: 'Noto Serif SC', serif;
+      letter-spacing: 0.02em;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    /* ========================
+       全屏预览 Lightbox
+       ======================== */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.96);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightbox.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 85vh;
+      object-fit: contain;
+      box-shadow: var(--shadow-hover);
+    }
+
+    .lightbox-close,
+    .lightbox-prev,
+    .lightbox-next {
+      position: absolute;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      transition: var(--transition);
+      padding: 1rem;
+    }
+
+    .lightbox-close:hover,
+    .lightbox-prev:hover,
+    .lightbox-next:hover {
+      color: var(--accent-dark);
+    }
+
+    .lightbox-close {
+      top: 1rem;
+      right: 1rem;
+    }
+
+    .lightbox-prev {
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .lightbox-next {
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .lightbox-close svg,
+    .lightbox-prev svg,
+    .lightbox-next svg {
+      width: 28px;
+      height: 28px;
+      stroke: currentColor;
+    }
+
+    .lightbox-counter {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ========================
+       弹窗 Modal
+       ======================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(6px);
+      z-index: 250;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-hover);
+      padding: 2rem;
+      width: 90%;
+      max-width: 460px;
+      border-radius: var(--radius);
+    }
+
+    .modal h3 {
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 400;
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.7rem;
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text);
+      background: var(--bg-soft);
+      border-radius: var(--radius);
+      transition: var(--transition);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.8rem;
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: var(--transition);
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+      color: var(--bg);
+    }
+
+    /* ========================
+       Toast 提示
+       ======================== */
+    .toast-container {
+      position: fixed;
+      top: 5rem;
+      right: 1.5rem;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    body.admin-mode .toast-container {
+      top: 7rem;
+    }
+
+    .toast {
+      background: rgba(255,255,255,0.95);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 0.9rem 1.4rem;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      color: var(--text);
+      transform: translateX(120%);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .toast.error {
+      border-left: 3px solid #c0392b;
+    }
+
+    .toast.success {
+      border-left: 3px solid var(--accent);
+    }
+
+    .toast svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ========================
+       响应式适配
+       ======================== */
+    @media (max-width: 900px) {
+      .split {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .hero-text {
+        order: 1;
+      }
+
+      .hero-img {
+        order: 0;
+        max-width: 420px;
+        margin: 0 auto;
+      }
+
+      .about-img::before {
+        display: none;
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      section {
+        padding: 5rem 5vw;
+      }
+
+      .nav-right {
+        gap: 0.8rem;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        max-width: 260px;
+        height: 100vh;
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        transition: right 0.3s ease;
+        box-shadow: -5px 0 30px rgba(0,0,0,0.05);
+      }
+
+      .nav-links.open {
+        right: 0;
+      }
+
+      .nav-links a {
+        font-size: 1rem;
+      }
+
+      .hamburger {
+        display: flex;
+        z-index: 102;
+      }
+
+      .timeline-actions {
+        position: static;
+        margin-top: 0.5rem;
+      }
+
+      .timeline-item {
+        padding-bottom: 2rem;
+      }
+
+      .about-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+      }
+
+      .photo-card {
+        padding: 5px;
+      }
+
+      .upload-area {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .modal {
+        padding: 1.5rem;
+      }
+
+      .text-editor-toolbar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.6rem;
+      }
+    }
+
+    /* 减少动画偏好 */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 管理员模式提示条 -->
+  <div class="admin-bar">
+    管理员模式已开启 · 所有修改将同步给所有访客
+  </div>
+
+  <!-- 导航栏 -->
+  <nav id="navbar">
+    <a class="logo" id="logo">DAFU</a>
+    <div class="nav-right">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#hero">首页</a></li>
+        <li><a href="#about">关于</a></li>
+        <li><a href="#gallery">相册</a></li>
+        <li><a href="#timeline">成长</a></li>
+      </ul>
+      <button class="edit-text-btn admin-only" id="editTextBtn">编辑文字</button>
+      <button class="exit-admin-btn admin-only" id="exitAdminBtn">退出管理</button>
+      <button class="hamburger" id="hamburger" aria-label="菜单">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero 首屏 -->
+  <section id="hero">
+    <div class="container split">
+      <div class="hero-text">
+        <span class="label">A little orange cat</span>
+        <h1><span class="editable-text" data-key="hero_title">大福 · DAFU</span></h1>
+        <span class="subtitle editable-text" data-key="hero_subtitle">Born in Late January</span>
+        <p class="editable-text" data-key="hero_intro">一只出生于一月底的橘白小猫，性格温顺又带点调皮。喜欢在阳光里打盹，也爱在清晨追逐自己的尾巴。</p>
+      </div>
+      <div class="hero-img">
+        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80" alt="大福">
+        <div class="frame-deco"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 关于大福 -->
+  <section id="about">
+    <div class="container split">
+      <div class="about-text">
+        <span class="label">About Dafu</span>
+        <h2>关于大福</h2>
+        <div class="info-list" id="infoList">
+          <!-- 动态渲染 cat_info -->
+        </div>
+        <button class="add-btn admin-only" id="addInfoBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          添加新信息
+        </button>
+      </div>
+      <div class="about-img">
+        <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=700&q=80" alt="大福侧脸" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- 核心相册 -->
+  <section id="gallery">
+    <div class="container">
+      <div class="gallery-header">
+        <div>
+          <span class="label">Gallery</span>
+          <h2>大福相册</h2>
+        </div>
+        <div class="upload-area">
+          <div class="upload-progress" id="uploadProgress"><div class="bar" id="progressBar"></div></div>
+          <button class="upload-btn admin-only" id="uploadBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            上传图片
+          </button>
+          <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
+        </div>
+      </div>
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="gallery-loading">正在从云端加载照片…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 成长时间线 -->
+  <section id="timeline">
+    <div class="container">
+      <span class="label" style="display:block;text-align:center;margin-bottom:1rem;">Growth</span>
+      <h2>成长时间线</h2>
+      <div class="timeline-list" id="timelineList">
+        <!-- 动态渲染 growth_timeline -->
+      </div>
+      <div style="text-align:center; margin-top:2rem;">
+        <button class="add-btn admin-only" id="addTimelineBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          添加新节点
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer>
+    <svg class="paw" viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.5a4.5 4.5 0 0 0-4.5 4.5c0 2.48 2.02 4.5 4.5 4.5s4.5-2.02 4.5-4.5a4.5 4.5 0 0 0-4.5-4.5zM6.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm11 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm-2.5-4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+    <p class="editable-text" data-key="footer_text">愿你的每一天都像大福一样，被阳光与温柔包围。</p>
+  </footer>
+
+  <!-- 全屏预览 -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose" aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <button class="lightbox-prev" id="lightboxPrev" aria-label="上一张">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <img src="" alt="" id="lightboxImg">
+    <button class="lightbox-next" id="lightboxNext" aria-label="下一张">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+  </div>
+
+  <!-- 基础信息 / 成长时间线 弹窗 -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <h3 id="modalTitle">添加</h3>
+      <div id="modalBody">
+        <!-- 动态表单 -->
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="modalCancel">取消</button>
+        <button class="btn btn-primary" id="modalSave">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部文字编辑工具栏 -->
+  <div class="text-editor-toolbar" id="textEditorToolbar">
+    <button class="btn" id="resetTextBtn">恢复默认</button>
+    <button class="btn" id="cancelTextBtn">取消编辑</button>
+    <button class="btn btn-primary" id="saveTextBtn">保存修改</button>
+  </div>
+
+  <!-- Toast 容器 -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    /* =====================================================
+       配置区：请修改为你自己的 Supabase 项目信息
+       ===================================================== */
+    const SUPABASE_URL = 'https://kyaaogsapbalnjnwjiac.supabase.co';     // Supabase 项目 URL
+    const SUPABASE_ANON_KEY = 'sb_publishable_QxCY51DYVWIjTkq3qoyiIA_GjzOiqnQ';            // anon 公钥
+    const BUCKET_NAME = 'dafu-photos';                          // 存储桶名称
+    const SITE_CONTENT_TABLE = 'site_content';                   // 全局文字表
+    const CAT_INFO_TABLE = 'cat_info';                           // 小猫信息表
+    const TIMELINE_TABLE = 'growth_timeline';                    // 成长时间线表
+    const ADMIN_PASSWORD = 'dafu2026';                           // 管理员密码
+
+    /* =====================================================
+       默认内容（恢复默认时使用）
+       ===================================================== */
+    const DEFAULT_CONTENT = {
+      hero_title: '大福 · DAFU',
+      hero_subtitle: 'Born in Late January',
+      hero_intro: '一只出生于一月底的橘白小猫，性格温顺又带点调皮。喜欢在阳光里打盹，也爱在清晨追逐自己的尾巴。',
+      footer_text: '愿你的每一天都像大福一样，被阳光与温柔包围。'
+    };
+
+    /* =====================================================
+       初始化 Supabase 客户端
+       ===================================================== */
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* =====================================================
+       DOM 元素
+       ===================================================== */
+    const body = document.body;
+    const navbar = document.getElementById('navbar');
+    const logo = document.getElementById('logo');
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    const exitAdminBtn = document.getElementById('exitAdminBtn');
+    const editTextBtn = document.getElementById('editTextBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const progressBar = document.getElementById('progressBar');
+    const galleryGrid = document.getElementById('galleryGrid');
+    const infoList = document.getElementById('infoList');
+    const addInfoBtn = document.getElementById('addInfoBtn');
+    const timelineList = document.getElementById('timelineList');
+    const addTimelineBtn = document.getElementById('addTimelineBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalSave = document.getElementById('modalSave');
+    const textEditorToolbar = document.getElementById('textEditorToolbar');
+    const saveTextBtn = document.getElementById('saveTextBtn');
+    const cancelTextBtn = document.getElementById('cancelTextBtn');
+    const resetTextBtn = document.getElementById('resetTextBtn');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const lightboxCounter = document.getElementById('lightboxCounter');
+    const toastContainer = document.getElementById('toastContainer');
+
+    // 全局状态
+    let isAdmin = false;
+    let isTextEditing = false;
+    let galleryPhotos = [];
+    let currentLightboxIndex = 0;
+    let catInfoData = [];
+    let timelineData = [];
+    let siteContent = { ...DEFAULT_CONTENT };
+    let modalMode = null;       // 'add-info' | 'edit-info' | 'add-timeline' | 'edit-timeline'
+    let modalEditingId = null;  // 编辑时的记录 id
+
+    /* =====================================================
+       工具函数：Toast 提示
+       ===================================================== */
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      const iconSvg = type === 'success'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="#c97f52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+      toast.innerHTML = `${iconSvg}<span>${message}</span>`;
+      toastContainer.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+
+    /* =====================================================
+       工具函数：图片压缩
+       ===================================================== */
+    function compressImage(file, maxSide = 1600, quality = 0.85) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let { width, height } = img;
+            if (width > height) {
+              if (width > maxSide) { height *= maxSide / width; width = maxSide; }
+            } else {
+              if (height > maxSide) { width *= maxSide / height; height = maxSide; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob((blob) => {
+              if (!blob) return reject(new Error('压缩失败'));
+              const compressedFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+              resolve(compressedFile);
+            }, 'image/jpeg', quality);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    /* =====================================================
+       管理员模式：连续点击 Logo 3次
+       ===================================================== */
+    let logoClickCount = 0;
+    let logoClickTimer = null;
+    logo.addEventListener('click', (e) => {
+      if (isAdmin) return;
+      e.preventDefault();
+      logoClickCount++;
+      if (!logoClickTimer) {
+        logoClickTimer = setTimeout(() => {
+          logoClickCount = 0;
+          logoClickTimer = null;
+        }, 1200);
+      }
+      if (logoClickCount >= 3) {
+        clearTimeout(logoClickTimer);
+        logoClickTimer = null;
+        logoClickCount = 0;
+        const pwd = prompt('请输入管理员密码：');
+        if (pwd === null) return;
+        if (pwd === ADMIN_PASSWORD) {
+          enableAdminMode();
+          showToast('管理员模式已开启', 'success');
+        } else {
+          showToast('密码错误', 'error');
+        }
+      }
+    });
+
+    function enableAdminMode() {
+      isAdmin = true;
+      body.classList.add('admin-mode');
+    }
+
+    function disableAdminMode() {
+      isAdmin = false;
+      body.classList.remove('admin-mode');
+      disableTextEdit();
+    }
+
+    exitAdminBtn.addEventListener('click', () => {
+      disableAdminMode();
+      showToast('已退出管理员模式', 'success');
+    });
+
+    /* =====================================================
+       全局文字编辑功能
+       ===================================================== */
+    editTextBtn.addEventListener('click', () => {
+      if (!isAdmin) return;
+      if (isTextEditing) {
+        disableTextEdit();
+      } else {
+        enableTextEdit();
+      }
+    });
+
+    function enableTextEdit() {
+      isTextEditing = true;
+      body.classList.add('text-edit-mode');
+      editTextBtn.classList.add('active');
+      editTextBtn.textContent = '退出编辑';
+      document.querySelectorAll('.editable-text').forEach(el => {
+        el.contentEditable = true;
+      });
+    }
+
+    function disableTextEdit() {
+      isTextEditing = false;
+      body.classList.remove('text-edit-mode');
+      editTextBtn.classList.remove('active');
+      editTextBtn.textContent = '编辑文字';
+      document.querySelectorAll('.editable-text').forEach(el => {
+        el.contentEditable = false;
+      });
+    }
+
+    saveTextBtn.addEventListener('click', async () => {
+      const updates = {};
+      document.querySelectorAll('.editable-text').forEach(el => {
+        const key = el.dataset.key;
+        if (key) updates[key] = el.innerText.trim();
+      });
+      try {
+        // 使用 upsert，按 key 冲突时更新
+        const rows = Object.entries(updates).map(([key, value]) => ({ key, value }));
+        const { error } = await supabase.from(SITE_CONTENT_TABLE).upsert(rows, { onConflict: 'key' });
+        if (error) throw error;
+        siteContent = { ...siteContent, ...updates };
+        disableTextEdit();
+        showToast('文字已保存并同步', 'success');
+      } catch (err) {
+        console.error('保存文字失败:', err);
+        showToast('保存失败：' + err.message, 'error');
+      }
+    });
+
+    cancelTextBtn.addEventListener('click', () => {
+      renderSiteContent();
+      disableTextEdit();
+    });
+
+    resetTextBtn.addEventListener('click', async () => {
+      if (!confirm('确定要恢复默认文字吗？')) return;
+      try {
+        const rows = Object.entries(DEFAULT_CONTENT).map(([key, value]) => ({ key, value }));
+        const { error } = await supabase.from(SITE_CONTENT_TABLE).upsert(rows, { onConflict: 'key' });
+        if (error) throw error;
+        siteContent = { ...DEFAULT_CONTENT };
+        renderSiteContent();
+        disableTextEdit();
+        showToast('已恢复默认文字', 'success');
+      } catch (err) {
+        showToast('恢复默认失败：' + err.message, 'error');
+      }
+    });
+
+    /* =====================================================
+       数据加载：全局文字
+       ===================================================== */
+    async function loadSiteContent() {
+      try {
+        const { data, error } = await supabase.from(SITE_CONTENT_TABLE).select('*');
+        if (error) throw error;
+        (data || []).forEach(row => {
+          if (row.key && row.value !== null) siteContent[row.key] = row.value;
+        });
+        renderSiteContent();
+      } catch (err) {
+        console.error('加载站点文字失败:', err);
+        // 使用默认文字继续渲染
+        renderSiteContent();
+      }
+    }
+
+    function renderSiteContent() {
+      document.querySelectorAll('.editable-text').forEach(el => {
+        const key = el.dataset.key;
+        if (key && siteContent[key]) {
+          el.innerText = siteContent[key];
+        }
+      });
+    }
+
+    /* =====================================================
+       数据加载：小猫基础信息
+       ===================================================== */
+    async function loadCatInfo() {
+      try {
+        const { data, error } = await supabase.from(CAT_INFO_TABLE).select('*').order('created_at', { ascending: true });
+        if (error) throw error;
+        catInfoData = data || [];
+        renderCatInfo();
+      } catch (err) {
+        console.error('加载小猫信息失败:', err);
+        infoList.innerHTML = '<div style="color:var(--text-light)">信息加载失败</div>';
+      }
+    }
+
+    function renderCatInfo() {
+      infoList.innerHTML = '';
+      if (catInfoData.length === 0) {
+        infoList.innerHTML = '<div style="color:var(--text-light)">暂无信息，管理员可点击添加。</div>';
+        return;
+      }
+      catInfoData.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'info-item';
+        div.innerHTML = `
+          <span class="info-label">${escapeHtml(item.label)}</span>
+          <span class="info-content">${escapeHtml(item.content)}</span>
+          <span class="info-actions admin-only">
+            <button class="icon-btn" data-action="edit-info" data-id="${item.id}" aria-label="编辑">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="icon-btn" data-action="delete-info" data-id="${item.id}" aria-label="删除">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </span>
+        `;
+        infoList.appendChild(div);
+      });
+
+      // 绑定事件
+      infoList.querySelectorAll('[data-action="edit-info"]').forEach(btn => {
+        btn.addEventListener('click', () => openInfoModal(btn.dataset.id));
+      });
+      infoList.querySelectorAll('[data-action="delete-info"]').forEach(btn => {
+        btn.addEventListener('click', () => deleteCatInfo(btn.dataset.id));
+      });
+    }
+
+    /* =====================================================
+       数据加载：成长时间线
+       ===================================================== */
+    async function loadTimeline() {
+      try {
+        const { data, error } = await supabase.from(TIMELINE_TABLE).select('*').order('event_date', { ascending: false });
+        if (error) throw error;
+        timelineData = data || [];
+        renderTimeline();
+      } catch (err) {
+        console.error('加载成长记录失败:', err);
+        timelineList.innerHTML = '<div style="color:var(--text-light);text-align:center;">时间线加载失败</div>';
+      }
+    }
+
+    function renderTimeline() {
+      timelineList.innerHTML = '';
+      if (timelineData.length === 0) {
+        timelineList.innerHTML = '<div style="color:var(--text-light);text-align:center;">暂无成长记录。</div>';
+        return;
+      }
+      timelineData.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = `timeline-item ${index === 0 ? 'current' : ''}`;
+        div.innerHTML = `
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">${formatDate(item.event_date)}</div>
+          <div class="timeline-title">${escapeHtml(item.title)}</div>
+          <div class="timeline-desc">${escapeHtml(item.description || '')}</div>
+          <span class="timeline-actions admin-only">
+            <button class="icon-btn" data-action="edit-timeline" data-id="${item.id}" aria-label="编辑">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="icon-btn" data-action="delete-timeline" data-id="${item.id}" aria-label="删除">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </span>
+        `;
+        timelineList.appendChild(div);
+      });
+
+      timelineList.querySelectorAll('[data-action="edit-timeline"]').forEach(btn => {
+        btn.addEventListener('click', () => openTimelineModal(btn.dataset.id));
+      });
+      timelineList.querySelectorAll('[data-action="delete-timeline"]').forEach(btn => {
+        btn.addEventListener('click', () => deleteTimeline(btn.dataset.id));
+      });
+    }
+
+    /* =====================================================
+       核心：相册（Storage）
+       ===================================================== */
+    async function loadGallery() {
+      galleryGrid.innerHTML = '<div class="gallery-loading">正在从云端加载照片…</div>';
+      try {
+        const { data, error } = await supabase.storage.from(BUCKET_NAME).list('', { sortBy: { column: 'created_at', order: 'desc' } });
+        if (error) throw error;
+        galleryPhotos = (data || [])
+          .filter(item => item.name && !item.name.startsWith('.emptyFolderPlaceholder'))
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        renderGallery();
+      } catch (err) {
+        console.error('加载相册失败:', err);
+        galleryGrid.innerHTML = '<div class="gallery-empty">加载失败，请检查 Supabase 配置与存储桶权限。</div>';
+        showToast('相册加载失败：' + err.message, 'error');
+      }
+    }
+
+    function renderGallery() {
+      galleryGrid.innerHTML = '';
+      if (galleryPhotos.length === 0) {
+        galleryGrid.innerHTML = '<div class="gallery-empty">相册还是空的，管理员可点击右上角上传。</div>';
+        return;
+      }
+      galleryPhotos.forEach((file, index) => {
+        const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(file.name);
+        const url = data.publicUrl;
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+        card.setAttribute('data-index', index);
+        card.innerHTML = `
+          <img data-src="${url}" alt="${file.name}" loading="lazy" class="lazy-img" style="background-color:#f4ede8;">
+          <button class="delete-btn admin-only" data-action="delete-photo" data-name="${file.name}" aria-label="删除">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        `;
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.delete-btn')) return;
+          openLightbox(index);
+        });
+        galleryGrid.appendChild(card);
+      });
+
+      galleryGrid.querySelectorAll('[data-action="delete-photo"]').forEach(btn => {
+        btn.addEventListener('click', () => deletePhoto(btn.dataset.name));
+      });
+
+      setupLazyLoad();
+    }
+
+    function setupLazyLoad() {
+      const lazyImages = document.querySelectorAll('.lazy-img');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              img.src = img.dataset.src;
+              img.onload = () => { img.style.backgroundColor = 'transparent'; };
+              observer.unobserve(img);
+            }
+          });
+        }, { rootMargin: '50px' });
+        lazyImages.forEach(img => observer.observe(img));
+      } else {
+        lazyImages.forEach(img => {
+          img.src = img.dataset.src;
+          img.onload = () => { img.style.backgroundColor = 'transparent'; };
+        });
+      }
+    }
+
+    uploadBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length === 0) return;
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      for (const file of files) {
+        if (!validTypes.includes(file.type)) {
+          showToast(`不支持的格式：${file.name}`, 'error');
+          return;
+        }
+      }
+      uploadProgress.style.display = 'block';
+      progressBar.style.width = '0%';
+      uploadBtn.disabled = true;
+      uploadBtn.style.opacity = '0.6';
+      try {
+        let completed = 0;
+        for (const file of files) {
+          const compressed = await compressImage(file);
+          const ext = file.name.split('.').pop() || 'jpg';
+          const fileName = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+          const { error } = await supabase.storage.from(BUCKET_NAME).upload(fileName, compressed, {
+            cacheControl: '3600',
+            upsert: false,
+            onUploadProgress: (progress) => {
+              const percent = Math.round((progress.loaded / progress.total) * 100);
+              const totalPercent = Math.round(((completed * 100) + percent) / files.length);
+              progressBar.style.width = `${totalPercent}%`;
+            }
+          });
+          if (error) throw error;
+          completed++;
+          progressBar.style.width = `${Math.round((completed / files.length) * 100)}%`;
+        }
+        showToast(`成功上传 ${files.length} 张照片`, 'success');
+        fileInput.value = '';
+        await loadGallery();
+      } catch (err) {
+        showToast('上传失败：' + err.message, 'error');
+      } finally {
+        uploadProgress.style.display = 'none';
+        progressBar.style.width = '0%';
+        uploadBtn.disabled = false;
+        uploadBtn.style.opacity = '1';
+      }
+    });
+
+    async function deletePhoto(fileName) {
+      if (!confirm('确定要删除这张照片吗？')) return;
+      try {
+        const { error } = await supabase.storage.from(BUCKET_NAME).remove([fileName]);
+        if (error) throw error;
+        showToast('照片已删除', 'success');
+        await loadGallery();
+      } catch (err) {
+        showToast('删除失败：' + err.message, 'error');
+      }
+    }
+
+    /* =====================================================
+       弹窗：小猫信息 / 成长时间线
+       ===================================================== */
+    addInfoBtn.addEventListener('click', () => openInfoModal());
+    addTimelineBtn.addEventListener('click', () => openTimelineModal());
+    modalCancel.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+    modalSave.addEventListener('click', saveModal);
+
+    function openModal(title, htmlBody) {
+      modalTitle.textContent = title;
+      modalBody.innerHTML = htmlBody;
+      modalOverlay.classList.add('active');
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      modalMode = null;
+      modalEditingId = null;
+    }
+
+    function openInfoModal(id = null) {
+      modalMode = id ? 'edit-info' : 'add-info';
+      modalEditingId = id;
+      let item = { label: '', content: '' };
+      if (id) {
+        item = catInfoData.find(i => i.id == id) || item;
+      }
+      openModal(id ? '编辑信息' : '添加信息', `
+        <div class="form-group"><label>信息标签</label><input type="text" id="infoLabel" value="${escapeHtml(item.label)}" placeholder="例如：体重"></div>
+        <div class="form-group"><label>信息内容</label><input type="text" id="infoContent" value="${escapeHtml(item.content)}" placeholder="例如：2.3 kg"></div>
+      `);
+    }
+
+    function openTimelineModal(id = null) {
+      modalMode = id ? 'edit-timeline' : 'add-timeline';
+      modalEditingId = id;
+      let item = { event_date: '', title: '', description: '' };
+      if (id) {
+        item = timelineData.find(i => i.id == id) || item;
+      }
+      openModal(id ? '编辑成长节点' : '添加成长节点', `
+        <div class="form-group"><label>日期</label><input type="date" id="timelineDate" value="${item.event_date || ''}"></div>
+        <div class="form-group"><label>标题</label><input type="text" id="timelineTitle" value="${escapeHtml(item.title)}" placeholder="例如：第一次打疫苗"></div>
+        <div class="form-group"><label>描述</label><textarea id="timelineDesc" placeholder="简短描述这一刻">${escapeHtml(item.description || '')}</textarea></div>
+      `);
+    }
+
+    async function saveModal() {
+      try {
+        if (modalMode === 'add-info' || modalMode === 'edit-info') {
+          const label = document.getElementById('infoLabel').value.trim();
+          const content = document.getElementById('infoContent').value.trim();
+          if (!label || !content) { showToast('请填写完整信息', 'error'); return; }
+          const payload = { label, content };
+          if (modalMode === 'edit-info') {
+            const { error } = await supabase.from(CAT_INFO_TABLE).update(payload).eq('id', modalEditingId);
+            if (error) throw error;
+          } else {
+            const { error } = await supabase.from(CAT_INFO_TABLE).insert(payload);
+            if (error) throw error;
+          }
+          showToast('信息已保存', 'success');
+          await loadCatInfo();
+        }
+        else if (modalMode === 'add-timeline' || modalMode === 'edit-timeline') {
+          const event_date = document.getElementById('timelineDate').value;
+          const title = document.getElementById('timelineTitle').value.trim();
+          const description = document.getElementById('timelineDesc').value.trim();
+          if (!event_date || !title) { showToast('请填写日期和标题', 'error'); return; }
+          const payload = { event_date, title, description };
+          if (modalMode === 'edit-timeline') {
+            const { error } = await supabase.from(TIMELINE_TABLE).update(payload).eq('id', modalEditingId);
+            if (error) throw error;
+          } else {
+            const { error } = await supabase.from(TIMELINE_TABLE).insert(payload);
+            if (error) throw error;
+          }
+          showToast('成长节点已保存', 'success');
+          await loadTimeline();
+        }
+        closeModal();
+      } catch (err) {
+        console.error('保存失败:', err);
+        showToast('保存失败：' + err.message, 'error');
+      }
+    }
+
+    async function deleteCatInfo(id) {
+      if (!confirm('确定要删除这条信息吗？')) return;
+      try {
+        const { error } = await supabase.from(CAT_INFO_TABLE).delete().eq('id', id);
+        if (error) throw error;
+        showToast('信息已删除', 'success');
+        await loadCatInfo();
+      } catch (err) {
+        showToast('删除失败：' + err.message, 'error');
+      }
+    }
+
+    async function deleteTimeline(id) {
+      if (!confirm('确定要删除这条成长记录吗？')) return;
+      try {
+        const { error } = await supabase.from(TIMELINE_TABLE).delete().eq('id', id);
+        if (error) throw error;
+        showToast('记录已删除', 'success');
+        await loadTimeline();
+      } catch (err) {
+        showToast('删除失败：' + err.message, 'error');
+      }
+    }
+
+    /* =====================================================
+       全屏预览 Lightbox
+       ===================================================== */
+    function openLightbox(index) {
+      currentLightboxIndex = index;
+      updateLightbox();
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    function updateLightbox() {
+      const file = galleryPhotos[currentLightboxIndex];
+      const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(file.name);
+      lightboxImg.src = data.publicUrl;
+      lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${galleryPhotos.length}`;
+    }
+    function prevImage() {
+      currentLightboxIndex = (currentLightboxIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
+      updateLightbox();
+    }
+    function nextImage() {
+      currentLightboxIndex = (currentLightboxIndex + 1) % galleryPhotos.length;
+      updateLightbox();
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+    lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') prevImage();
+      if (e.key === 'ArrowRight') nextImage();
+    });
+
+    /* =====================================================
+       导航栏滚动毛玻璃 & 移动端汉堡菜单
+       ===================================================== */
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 30) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    });
+
+    hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => navLinks.classList.remove('open'));
+    });
+
+    /* =====================================================
+       工具函数：HTML 转义 & 日期格式化
+       ===================================================== */
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}年${m}月${day}日`;
+    }
+
+    /* =====================================================
+       页面初始化
+       ===================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSiteContent();
+      loadCatInfo();
+      loadTimeline();
+      loadGallery();
+    });
+  </script>
+</body>
+</html>
