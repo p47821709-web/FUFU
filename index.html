@@ -5,29 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>大福 · DAFU</title>
   
-  <!-- Google Fonts：衬线标题 + 无衬线正文 -->
+  <!-- Google Fonts：圆润标题 + 清晰正文 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
   
   <style>
     /* ========================
-       设计令牌 / CSS Variables
+       设计令牌 / CSS Variables（奶油系配色）
        ======================== */
     :root {
-      --bg: #ffffff;
-      --bg-soft: #fdfbf9;
-      --text: #3a3a3a;
-      --text-light: #6e6e6e;
-      --accent: #e8a87c;           /* 低饱和浅橘 */
-      --accent-soft: #f6e2d3;      /* 橘色极淡 tint */
-      --accent-dark: #c97f52;
-      --border: #efe9e4;
-      --shadow: 0 8px 30px rgba(58, 58, 58, 0.06);
-      --shadow-hover: 0 14px 40px rgba(58, 58, 58, 0.1);
-      --radius: 2px;
+      --bg: #FFFBF5;              /* 奶油白 */
+      --bg-soft: #FFF7EA;         /* 浅杏白 */
+      --text: #5A4A3C;            /* 暖棕灰 */
+      --text-light: #6B5D4E;      /* 柔和浅灰（加深满足WCAG AA对比度） */
+      --accent: #E08060;          /* 奶橘色（加深满足WCAG AA对比度） */
+      --accent-soft: #FFD8B8;     /* 浅杏橘 */
+      --accent-dark: #C5704A;     /* 深奶橘（加深） */
+      --border: #F0D9C5;          /* 奶油边框 */
+      --error: #C05A4A;           /* 错误/删除红 */
+      --error-soft: rgba(192, 90, 74, 0.08);
+      --shadow: 0 4px 20px rgba(90, 74, 60, 0.06);
+      --shadow-hover: 0 8px 30px rgba(90, 74, 60, 0.1);
+      --radius: 14px;
+      --radius-sm: 10px;
       --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       --max-width: 1200px;
+      --font-display: 'Quicksand', sans-serif;
+      --font-body: 'Noto Sans SC', sans-serif;
+      --font-heading: 'Noto Serif SC', serif;
     }
 
     * {
@@ -41,22 +47,24 @@
     }
 
     body {
-      font-family: 'Noto Sans SC', sans-serif;
+      font-family: var(--font-body);
       background: var(--bg);
       color: var(--text);
-      line-height: 1.8;
-      font-weight: 300;
+      line-height: 1.9;
+      font-weight: 400;
+      font-size: 1.05rem;
       letter-spacing: 0.02em;
       -webkit-font-smoothing: antialiased;
-      transition: padding-top 0.3s ease;  /* 管理员模式切换时平滑过渡 */
+      transition: padding-top 0.3s ease;
     }
 
     /* 装饰性小标签文字 */
     .label {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.75rem;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.12em;
       color: var(--accent-dark);
     }
 
@@ -94,16 +102,16 @@
     }
 
     body.text-edit-mode .editable-text {
-      border: 1px dashed var(--accent);
-      background: rgba(232, 168, 124, 0.06);
+      border: 1.5px dashed var(--accent);
+      background: rgba(224, 128, 96, 0.06);
       padding: 0.2rem 0.5rem;
-      border-radius: var(--radius);
+      border-radius: var(--radius-sm);
       cursor: text;
     }
 
     body.text-edit-mode .editable-text:focus {
       outline: none;
-      background: rgba(232, 168, 124, 0.12);
+      background: rgba(224, 128, 96, 0.12);
     }
 
     /* 管理员模式提示条 */
@@ -113,11 +121,12 @@
       left: 0;
       width: 100%;
       z-index: 99;
-      background: rgba(246, 226, 211, 0.95);
+      background: rgba(255, 216, 184, 0.92);
       backdrop-filter: blur(8px);
       color: var(--accent-dark);
-      font-size: 0.8rem;
-      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.6rem 1rem;
       text-align: center;
       transform: translateY(-100%);
       transition: transform 0.3s ease;
@@ -128,7 +137,7 @@
     }
 
     body.admin-mode {
-      padding-top: 2rem;
+      padding-top: 2.2rem;
     }
 
     /* 底部固定编辑工具栏 */
@@ -137,16 +146,17 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      background: rgba(255,255,255,0.96);
+      background: rgba(255, 251, 245, 0.96);
       backdrop-filter: blur(12px);
       border-top: 1px solid var(--border);
-      padding: 0.8rem 1.5rem;
+      padding: 0.9rem 1.5rem;
       display: flex;
       justify-content: center;
       gap: 1rem;
       z-index: 150;
       transform: translateY(100%);
       transition: transform 0.3s ease;
+      border-radius: var(--radius) var(--radius) 0 0;
     }
 
     body.text-edit-mode .text-editor-toolbar {
@@ -170,22 +180,22 @@
     }
 
     body.admin-mode nav {
-      top: 2rem;
+      top: 2.4rem;
     }
 
     nav.scrolled {
-      background: rgba(255, 255, 255, 0.82);
+      background: rgba(255, 251, 245, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+      box-shadow: 0 2px 16px rgba(90, 74, 60, 0.04);
       padding: 1rem 4vw;
     }
 
     .logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
       color: var(--text);
       text-decoration: none;
       cursor: pointer;
@@ -208,8 +218,8 @@
     .nav-links a {
       text-decoration: none;
       color: var(--text-light);
-      font-size: 0.85rem;
-      font-weight: 400;
+      font-size: 0.95rem;
+      font-weight: 500;
       position: relative;
       transition: var(--transition);
     }
@@ -220,7 +230,8 @@
       bottom: -4px;
       left: 0;
       width: 0;
-      height: 1px;
+      height: 2px;
+      border-radius: 2px;
       background: var(--accent);
       transition: var(--transition);
     }
@@ -230,6 +241,14 @@
     }
 
     .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-links a.active {
+      color: var(--text);
+    }
+
+    .nav-links a.active::after {
       width: 100%;
     }
 
@@ -245,22 +264,24 @@
 
     .hamburger span {
       display: block;
-      width: 22px;
-      height: 1px;
+      width: 24px;
+      height: 2px;
+      border-radius: 2px;
       background: var(--text);
       transition: var(--transition);
     }
 
     .exit-admin-btn,
     .edit-text-btn {
-      padding: 0.45rem 1rem;
-      border: 1px solid var(--border);
+      padding: 0.5rem 1.2rem;
+      border: 1.5px solid var(--border);
       background: var(--bg);
       color: var(--text);
-      font-size: 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 500;
       font-family: inherit;
       cursor: pointer;
-      border-radius: var(--radius);
+      border-radius: var(--radius-sm);
       transition: var(--transition);
       white-space: nowrap;
     }
@@ -268,6 +289,7 @@
     .exit-admin-btn:hover,
     .edit-text-btn:hover {
       border-color: var(--accent);
+      background: var(--accent-soft);
       color: var(--accent-dark);
     }
 
@@ -275,6 +297,34 @@
       background: var(--accent-soft);
       border-color: var(--accent);
       color: var(--accent-dark);
+    }
+
+    /* 管理员入口按钮（始终可见） */
+    .admin-entry-btn {
+      width: 34px;
+      height: 34px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      color: var(--text-light);
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .admin-entry-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+    }
+
+    body.admin-mode .admin-entry-btn {
+      display: none;
     }
 
     /* ========================
@@ -312,35 +362,38 @@
     }
 
     .hero-text h1 {
-      font-family: 'Noto Serif SC', serif;
-      font-size: clamp(2.8rem, 6vw, 5rem);
-      font-weight: 400;
-      line-height: 1.15;
+      font-family: var(--font-heading);
+      font-size: clamp(3.2rem, 7vw, 5.5rem);
+      font-weight: 600;
+      line-height: 1.1;
       margin-bottom: 1rem;
       color: var(--text);
     }
 
     .hero-text .subtitle {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 1.1rem;
-      color: var(--accent-dark);
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 1.2rem;
+      color: var(--accent);
       margin-bottom: 1.5rem;
       display: block;
     }
 
     .hero-text p {
       color: var(--text-light);
-      max-width: 420px;
-      font-size: 1rem;
-      line-height: 1.9;
+      max-width: 440px;
+      font-size: 1.1rem;
+      line-height: 2;
+      font-weight: 400;
     }
 
     .hero-img {
       position: relative;
       aspect-ratio: 1 / 1;
       background: var(--accent-soft);
+      border-radius: var(--radius);
       overflow: hidden;
+      box-shadow: var(--shadow-hover);
     }
 
     .hero-img img {
@@ -358,7 +411,8 @@
     .frame-deco {
       position: absolute;
       inset: 12px;
-      border: 1px solid rgba(255,255,255,0.5);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: var(--radius-sm);
       pointer-events: none;
     }
 
@@ -370,39 +424,47 @@
     }
 
     .about-text h2 {
-      font-family: 'Noto Serif SC', serif;
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 400;
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4.5vw, 2.8rem);
+      font-weight: 600;
       margin-bottom: 2rem;
     }
 
     .info-list {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.8rem;
     }
 
     .info-item {
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 0.8rem 0;
-      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.2rem;
+      background: var(--bg-soft);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
     }
 
     .info-label {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: var(--font-display);
       font-size: 0.75rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--accent-dark);
-      min-width: 80px;
+      letter-spacing: 0.08em;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.25rem 0.7rem;
+      border-radius: 20px;
+      min-width: auto;
+      white-space: nowrap;
     }
 
     .info-content {
       flex: 1;
       color: var(--text);
-      font-weight: 400;
+      font-weight: 500;
+      font-size: 1rem;
     }
 
     .info-actions {
@@ -411,9 +473,9 @@
     }
 
     .icon-btn {
-      width: 28px;
-      height: 28px;
-      border: 1px solid var(--border);
+      width: 32px;
+      height: 32px;
+      border: 1.5px solid var(--border);
       background: var(--bg);
       border-radius: 50%;
       cursor: pointer;
@@ -426,45 +488,51 @@
 
     .icon-btn:hover {
       border-color: var(--accent);
+      background: var(--accent-soft);
       color: var(--accent-dark);
     }
 
     .icon-btn svg {
-      width: 13px;
-      height: 13px;
+      width: 14px;
+      height: 14px;
       stroke: currentColor;
     }
 
     .add-btn {
-      margin-top: 1rem;
+      margin-top: 1.2rem;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      border: 1px dashed var(--border);
+      padding: 0.7rem 1.4rem;
+      border: 1.5px dashed var(--accent);
       background: transparent;
-      color: var(--text-light);
-      font-size: 0.8rem;
+      color: var(--accent-dark);
+      font-size: 0.85rem;
+      font-weight: 500;
       font-family: inherit;
       cursor: pointer;
-      border-radius: var(--radius);
+      border-radius: var(--radius-sm);
       transition: var(--transition);
     }
 
     .add-btn:hover {
-      border-color: var(--accent);
+      background: var(--accent-soft);
       color: var(--accent-dark);
+      border-style: solid;
     }
 
     .about-img {
       position: relative;
       background: var(--bg-soft);
+      border-radius: var(--radius);
+      overflow: hidden;
     }
 
     .about-img img {
       width: 100%;
       display: block;
       box-shadow: var(--shadow);
+      border-radius: var(--radius);
     }
 
     .about-img::before {
@@ -475,6 +543,7 @@
       width: 60%;
       height: 60%;
       background: var(--accent-soft);
+      border-radius: var(--radius);
       z-index: -1;
     }
 
@@ -495,9 +564,9 @@
     }
 
     .gallery-header h2 {
-      font-family: 'Noto Serif SC', serif;
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 400;
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4.5vw, 2.8rem);
+      font-weight: 600;
     }
 
     .upload-area {
@@ -510,35 +579,36 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.65rem 1.4rem;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 0.8rem;
+      padding: 0.7rem 1.5rem;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 500;
       font-family: inherit;
       cursor: pointer;
-      border-radius: var(--radius);
+      border-radius: var(--radius-sm);
       transition: var(--transition);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 12px rgba(224, 128, 96, 0.25);
     }
 
     .upload-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent-dark);
-      box-shadow: var(--shadow);
+      background: var(--accent-dark);
+      box-shadow: 0 6px 18px rgba(224, 128, 96, 0.35);
+      transform: translateY(-1px);
     }
 
     .upload-btn svg {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       stroke: currentColor;
     }
 
     .upload-progress {
       width: 120px;
-      height: 2px;
+      height: 4px;
       background: var(--border);
-      border-radius: 2px;
+      border-radius: 4px;
       overflow: hidden;
       display: none;
     }
@@ -547,7 +617,8 @@
       height: 100%;
       width: 0%;
       background: var(--accent);
-      transition: width 0.2s ease;
+      border-radius: 4px;
+      transition: width 0.3s ease;
     }
 
     /* 图片网格 */
@@ -562,6 +633,7 @@
       aspect-ratio: 1 / 1;
       background: var(--bg);
       padding: 8px;
+      border-radius: var(--radius-sm);
       box-shadow: var(--shadow);
       transition: var(--transition);
       cursor: pointer;
@@ -578,6 +650,7 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      border-radius: calc(var(--radius-sm) - 4px);
       transition: transform 0.6s ease;
     }
 
@@ -589,10 +662,10 @@
       position: absolute;
       top: 16px;
       right: 16px;
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255, 255, 255, 0.92);
       border: none;
       display: flex;
       align-items: center;
@@ -602,6 +675,7 @@
       transform: translateY(-4px);
       transition: var(--transition);
       z-index: 2;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .photo-card:hover .delete-btn {
@@ -617,7 +691,7 @@
 
     .delete-btn:hover {
       background: #fff;
-      color: #c0392b;
+      color: var(--error);
     }
 
     .delete-btn svg {
@@ -638,8 +712,8 @@
       text-align: center;
       padding: 4rem 0;
       color: var(--text-light);
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
+      font-family: var(--font-display);
+      font-weight: 500;
     }
 
     /* ========================
@@ -650,9 +724,9 @@
     }
 
     #timeline h2 {
-      font-family: 'Noto Serif SC', serif;
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 400;
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4.5vw, 2.8rem);
+      font-weight: 600;
       text-align: center;
       margin-bottom: 4rem;
     }
@@ -661,22 +735,23 @@
       position: relative;
       max-width: 700px;
       margin: 0 auto;
-      padding-left: 2rem;
+      padding-left: 2.5rem;
     }
 
     .timeline-list::before {
       content: '';
       position: absolute;
-      left: 6px;
+      left: 8px;
       top: 8px;
       bottom: 8px;
-      width: 1px;
-      background: var(--border);
+      width: 2px;
+      border-radius: 2px;
+      background: var(--accent-soft);
     }
 
     .timeline-item {
       position: relative;
-      padding-bottom: 3rem;
+      padding-bottom: 3.5rem;
     }
 
     .timeline-item:last-child {
@@ -685,14 +760,15 @@
 
     .timeline-dot {
       position: absolute;
-      left: -1.85rem;
+      left: -2.1rem;
       top: 0.35rem;
-      width: 13px;
-      height: 13px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
       background: var(--bg);
-      border: 2px solid var(--accent);
+      border: 3px solid var(--accent);
       z-index: 1;
+      box-shadow: 0 0 0 4px var(--bg-soft);
     }
 
     .timeline-item.current .timeline-dot {
@@ -700,24 +776,25 @@
     }
 
     .timeline-date {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: var(--font-display);
       font-size: 0.85rem;
-      color: var(--accent-dark);
-      letter-spacing: 0.08em;
-      margin-bottom: 0.3rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.4rem;
     }
 
     .timeline-title {
-      font-size: 1.1rem;
-      font-weight: 400;
-      margin-bottom: 0.4rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
       color: var(--text);
     }
 
     .timeline-desc {
       color: var(--text-light);
-      font-size: 0.95rem;
-      line-height: 1.7;
+      font-size: 1rem;
+      line-height: 1.8;
     }
 
     .timeline-actions {
@@ -732,27 +809,29 @@
        页脚
        ======================== */
     footer {
-      background: var(--bg-soft);
+      background: var(--accent-soft);
       border-top: 1px solid var(--border);
-      padding: 3rem 4vw;
+      padding: 3.5rem 4vw;
       text-align: center;
     }
 
     .paw {
-      width: 18px;
-      height: 18px;
+      width: 22px;
+      height: 22px;
       margin: 0 auto 0.8rem;
-      opacity: 0.5;
+      opacity: 0.6;
+      color: var(--accent);
     }
 
     footer p {
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: var(--text-light);
-      font-family: 'Noto Serif SC', serif;
+      font-family: var(--font-body);
+      font-weight: 400;
       letter-spacing: 0.02em;
-      max-width: 500px;
+      max-width: 520px;
       margin: 0 auto;
-      line-height: 1.8;
+      line-height: 1.9;
     }
 
     /* ========================
@@ -761,24 +840,28 @@
     .lightbox {
       position: fixed;
       inset: 0;
-      background: rgba(255,255,255,0.96);
+      background: rgba(255, 251, 245, 0.96);
       z-index: 200;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
     .lightbox.active {
-      display: flex;
       opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
     }
 
     .lightbox img {
       max-width: 90vw;
       max-height: 85vh;
       object-fit: contain;
+      border-radius: var(--radius-sm);
       box-shadow: var(--shadow-hover);
     }
 
@@ -786,33 +869,40 @@
     .lightbox-prev,
     .lightbox-next {
       position: absolute;
-      background: none;
+      background: rgba(255, 251, 245, 0.8);
       border: none;
+      border-radius: 50%;
       cursor: pointer;
       color: var(--text);
       transition: var(--transition);
-      padding: 1rem;
+      padding: 0.8rem;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .lightbox-close:hover,
     .lightbox-prev:hover,
     .lightbox-next:hover {
+      background: var(--accent-soft);
       color: var(--accent-dark);
     }
 
     .lightbox-close {
-      top: 1rem;
-      right: 1rem;
+      top: 1.5rem;
+      right: 1.5rem;
     }
 
     .lightbox-prev {
-      left: 1rem;
+      left: 1.5rem;
       top: 50%;
       transform: translateY(-50%);
     }
 
     .lightbox-next {
-      right: 1rem;
+      right: 1.5rem;
       top: 50%;
       transform: translateY(-50%);
     }
@@ -820,20 +910,21 @@
     .lightbox-close svg,
     .lightbox-prev svg,
     .lightbox-next svg {
-      width: 28px;
-      height: 28px;
+      width: 22px;
+      height: 22px;
       stroke: currentColor;
     }
 
     .lightbox-counter {
       position: absolute;
-      bottom: 1.5rem;
+      bottom: 2rem;
       left: 50%;
       transform: translateX(-50%);
-      font-family: 'Cormorant Garamond', serif;
+      font-family: var(--font-display);
+      font-weight: 600;
       color: var(--text-light);
       font-size: 0.9rem;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
     }
 
     /* ========================
@@ -842,36 +933,40 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(255,255,255,0.85);
-      backdrop-filter: blur(6px);
+      background: rgba(255, 251, 245, 0.88);
+      backdrop-filter: blur(8px);
       z-index: 250;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
     .modal-overlay.active {
-      display: flex;
       opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
     }
 
     .modal {
       background: var(--bg);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       box-shadow: var(--shadow-hover);
-      padding: 2rem;
+      padding: 2.2rem;
       width: 90%;
       max-width: 460px;
       border-radius: var(--radius);
     }
 
     .modal h3 {
-      font-family: 'Noto Serif SC', serif;
-      font-weight: 400;
-      font-size: 1.3rem;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 1.4rem;
       margin-bottom: 1.5rem;
+      color: var(--text);
     }
 
     .form-group {
@@ -880,22 +975,24 @@
 
     .form-group label {
       display: block;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 500;
       color: var(--text-light);
       margin-bottom: 0.4rem;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
     }
 
     .form-group input,
     .form-group textarea {
       width: 100%;
-      padding: 0.7rem;
-      border: 1px solid var(--border);
+      padding: 0.8rem 1rem;
+      border: 1.5px solid var(--border);
       font-family: inherit;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      font-weight: 400;
       color: var(--text);
       background: var(--bg-soft);
-      border-radius: var(--radius);
+      border-radius: var(--radius-sm);
       transition: var(--transition);
     }
 
@@ -904,6 +1001,7 @@
       outline: none;
       border-color: var(--accent);
       background: var(--bg);
+      box-shadow: 0 0 0 3px rgba(224, 128, 96, 0.1);
     }
 
     .form-group textarea {
@@ -919,32 +1017,36 @@
     }
 
     .btn {
-      padding: 0.6rem 1.2rem;
-      border: 1px solid var(--border);
+      padding: 0.7rem 1.4rem;
+      border: 1.5px solid var(--border);
       background: var(--bg);
       color: var(--text);
-      font-size: 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 500;
       font-family: inherit;
       cursor: pointer;
-      border-radius: var(--radius);
+      border-radius: var(--radius-sm);
       transition: var(--transition);
     }
 
     .btn:hover {
       border-color: var(--accent);
+      background: var(--accent-soft);
       color: var(--accent-dark);
     }
 
     .btn-primary {
-      background: var(--text);
-      color: var(--bg);
-      border-color: var(--text);
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(224, 128, 96, 0.25);
     }
 
     .btn-primary:hover {
       background: var(--accent-dark);
       border-color: var(--accent-dark);
-      color: var(--bg);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(224, 128, 96, 0.35);
     }
 
     /* ========================
@@ -965,12 +1067,13 @@
     }
 
     .toast {
-      background: rgba(255,255,255,0.95);
-      border: 1px solid var(--border);
+      background: rgba(255, 251, 245, 0.96);
+      border: 1.5px solid var(--border);
       box-shadow: var(--shadow);
       padding: 0.9rem 1.4rem;
-      border-radius: var(--radius);
-      font-size: 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 500;
       color: var(--text);
       transform: translateX(120%);
       opacity: 0;
@@ -986,7 +1089,7 @@
     }
 
     .toast.error {
-      border-left: 3px solid #c0392b;
+      border-left: 3px solid var(--error);
     }
 
     .toast.success {
@@ -1026,11 +1129,24 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
       }
+
+      .timeline-actions {
+        position: static;
+        margin-top: 0.5rem;
+      }
+
+      .timeline-item {
+        padding-bottom: 2rem;
+      }
     }
 
     @media (max-width: 600px) {
       section {
         padding: 5rem 5vw;
+      }
+
+      nav {
+        padding: 1rem 5vw;
       }
 
       .nav-right {
@@ -1044,14 +1160,15 @@
         width: 70%;
         max-width: 260px;
         height: 100vh;
-        background: rgba(255,255,255,0.96);
+        background: rgba(255, 251, 245, 0.96);
         backdrop-filter: blur(20px);
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 2rem;
+        gap: 2.5rem;
         transition: right 0.3s ease;
-        box-shadow: -5px 0 30px rgba(0,0,0,0.05);
+        box-shadow: -5px 0 30px rgba(90, 74, 60, 0.05);
+        border-radius: var(--radius) 0 0 var(--radius);
       }
 
       .nav-links.open {
@@ -1065,15 +1182,6 @@
       .hamburger {
         display: flex;
         z-index: 102;
-      }
-
-      .timeline-actions {
-        position: static;
-        margin-top: 0.5rem;
-      }
-
-      .timeline-item {
-        padding-bottom: 2rem;
       }
 
       .gallery-grid {
@@ -1101,11 +1209,41 @@
       }
     }
 
+    /* 跳过导航链接 */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      z-index: 1000;
+      padding: 0.6rem 1.2rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      font-family: var(--font-body);
+    }
+    .skip-link:focus {
+      top: 1rem;
+    }
+
+    /* 全局焦点样式 */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
     /* 减少动画偏好 */
     @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0s !important;
+        scroll-behavior: auto !important;
       }
       html {
         scroll-behavior: auto;
@@ -1115,6 +1253,9 @@
 </head>
 <body>
 
+  <!-- 跳过导航链接 -->
+  <a href="#hero" class="skip-link">跳到主要内容</a>
+
   <!-- 管理员模式提示条 -->
   <div class="admin-bar">
     管理员模式已开启 · 所有修改将同步给所有访客
@@ -1122,7 +1263,7 @@
 
   <!-- 导航栏 -->
   <nav id="navbar">
-    <a class="logo" id="logo">DAFU</a>
+    <a class="logo" id="logo" aria-label="大福首页（三击切换管理员模式）">DAFU</a>
     <div class="nav-right">
       <ul class="nav-links" id="navLinks">
         <li><a href="#hero">首页</a></li>
@@ -1130,7 +1271,8 @@
         <li><a href="#gallery">相册</a></li>
         <li><a href="#timeline">成长</a></li>
       </ul>
-      <button class="edit-text-btn admin-only" id="editTextBtn">编辑文字</button>
+      <button class="admin-entry-btn" id="adminEntryBtn" aria-label="管理员入口" title="管理员入口">⚙</button>
+      <button class="edit-text-btn admin-only" id="editTextBtn" aria-label="编辑页面文字">编辑文字</button>
       <button class="exit-admin-btn admin-only" id="exitAdminBtn">退出管理</button>
       <button class="hamburger" id="hamburger" aria-label="菜单">
         <span></span>
@@ -1141,16 +1283,16 @@
   </nav>
 
   <!-- Hero 首屏 -->
-  <section id="hero">
+  <section id="hero" role="main" aria-labelledby="hero-heading">
     <div class="container split">
       <div class="hero-text">
         <span class="label">A little orange cat</span>
-        <h1><span class="editable-text" data-key="hero_title">大福 · DAFU</span></h1>
+        <h1 id="hero-heading"><span class="editable-text" data-key="hero_title">大福 · DAFU</span></h1>
         <span class="subtitle editable-text" data-key="hero_subtitle">Born in Late January</span>
         <p class="editable-text" data-key="hero_intro">一只出生于一月底的橘白小猫，性格温顺又带点调皮。喜欢在阳光里打盹，也爱在清晨追逐自己的尾巴。</p>
       </div>
       <div class="hero-img">
-        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80" alt="大福">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWmrxqSLwdjWeTYWltXvVxnN_uahK9zQAC9h8AAlnESFaLmMxetAvUSDwE.jpg" alt="大福">
         <div class="frame-deco"></div>
       </div>
     </div>
@@ -1171,7 +1313,7 @@
         </button>
       </div>
       <div class="about-img">
-        <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=700&q=80" alt="大福侧脸" loading="lazy">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWm1tqSMXV6QQ5ZKlDuf7dGvVCaQn49AACsSAAAlnESFbMzyqi9BT4MzwE.jpg" alt="大福侧脸" loading="lazy">
       </div>
     </div>
   </section>
@@ -1186,7 +1328,7 @@
         </div>
         <div class="upload-area">
           <div class="upload-progress" id="uploadProgress"><div class="bar" id="progressBar"></div></div>
-          <button class="upload-btn admin-only" id="uploadBtn">
+          <button class="upload-btn admin-only" id="uploadBtn" aria-label="上传照片到相册">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             上传图片
           </button>
@@ -1253,48 +1395,42 @@
 
   <!-- 底部文字编辑工具栏 -->
   <div class="text-editor-toolbar" id="textEditorToolbar">
-    <button class="btn" id="resetTextBtn">恢复默认</button>
-    <button class="btn" id="cancelTextBtn">取消编辑</button>
-    <button class="btn btn-primary" id="saveTextBtn">保存修改</button>
+    <button class="btn" id="resetTextBtn" aria-label="恢复默认文字">恢复默认</button>
+    <button class="btn" id="cancelTextBtn" aria-label="取消编辑文字">取消编辑</button>
+    <button class="btn btn-primary" id="saveTextBtn" aria-label="保存文字修改">保存修改</button>
   </div>
 
   <!-- Toast 容器 -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Supabase JS SDK CDN（放在 body 底部，不阻塞页面渲染） -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- Supabase SDK 由下方 JS 动态加载，不阻塞页面渲染 -->
 
   <script>
     /* =====================================================
        配置区：请修改为你自己的 Supabase 项目信息
        ===================================================== */
-    const SUPABASE_URL = 'https://kyaaogsapbalnjnwjiac.supabase.co';     // Supabase 项目 URL
-    const SUPABASE_ANON_KEY = 'sb_publishable_QxCY51DYVWIjTkq3qoyiIA_GjzOiqnQ';            // anon 公钥
-    const BUCKET_NAME = 'dafu-photos';                          // 存储桶名称
-    const SITE_CONTENT_TABLE = 'site_content';                   // 全局文字表（key 列需设为 PRIMARY KEY）
-    const CAT_INFO_TABLE = 'cat_info';                           // 小猫信息表
-    const TIMELINE_TABLE = 'growth_timeline';                    // 成长时间线表
-    const ADMIN_PASSWORD = 'dafu2026';                           // 管理员密码
-    const MAX_FILE_SIZE = 10 * 1024 * 1024;                      // 上传文件大小限制：10MB
+    const SUPABASE_URL = 'https://kyaaogsapbalnjnwjiac.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_QxCY51DYVWIjTkq3qoyiIA_GjzOiqnQ';
+    const BUCKET_NAME = 'dafu-photos';
+    const SITE_CONTENT_TABLE = 'site_content';
+    const CAT_INFO_TABLE = 'cat_info';
+    const TIMELINE_TABLE = 'growth_timeline';
+    const ADMIN_PASSWORD = 'dafu2026';
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    const SDK_CDN_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    const SDK_LOAD_TIMEOUT = 10000;
+    const SDK_MAX_RETRIES = 3;
 
     /*
-       Supabase 建表 SQL（在 SQL Editor 中执行）：
-       
+       Supabase 建表 SQL（在 SQL Editor 中执行，无需开启 RLS）：
        CREATE TABLE site_content (key TEXT PRIMARY KEY, value TEXT);
        CREATE TABLE cat_info (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, label TEXT NOT NULL, content TEXT NOT NULL, created_at TIMESTAMPTZ DEFAULT now());
        CREATE TABLE growth_timeline (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, event_date DATE NOT NULL, title TEXT NOT NULL, description TEXT, created_at TIMESTAMPTZ DEFAULT now());
-       
-       -- 启用 RLS 并允许匿名读写
-       ALTER TABLE site_content ENABLE ROW LEVEL SECURITY;
-       ALTER TABLE cat_info ENABLE ROW LEVEL SECURITY;
-       ALTER TABLE growth_timeline ENABLE ROW LEVEL SECURITY;
-       CREATE POLICY "Allow all" ON site_content FOR ALL USING (true) WITH CHECK (true);
-       CREATE POLICY "Allow all" ON cat_info FOR ALL USING (true) WITH CHECK (true);
-       CREATE POLICY "Allow all" ON growth_timeline FOR ALL USING (true) WITH CHECK (true);
+       -- 注意：本应用不启用 RLS，表创建后即可通过 anon key 直接访问
     */
 
     /* =====================================================
-       默认内容（恢复默认时使用）
+       默认内容
        ===================================================== */
     const DEFAULT_CONTENT = {
       hero_title: '大福 · DAFU',
@@ -1304,18 +1440,260 @@
     };
 
     /* =====================================================
-       初始化 Supabase 客户端（安全初始化，避免阻断页面）
+       Mock 降级数据（Supabase 不可用时自动使用）
        ===================================================== */
-    let supabase = null;
-    try {
-      if (window.supabase && typeof window.supabase.createClient === 'function') {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      } else {
-        console.warn('Supabase SDK 未加载，云端功能不可用');
-      }
-    } catch (e) {
-      console.warn('Supabase 初始化失败:', e.message);
+    const MOCK_IMAGES = [
+      { name: 'mock_photo_01.jpg', created_at: '2026-01-15T10:00:00Z' },
+      { name: 'mock_photo_02.jpg', created_at: '2026-02-20T14:30:00Z' },
+      { name: 'mock_photo_03.jpg', created_at: '2026-03-10T09:00:00Z' },
+      { name: 'mock_photo_04.jpg', created_at: '2026-04-05T16:00:00Z' },
+      { name: 'mock_photo_05.jpg', created_at: '2026-05-18T11:00:00Z' },
+      { name: 'mock_photo_06.jpg', created_at: '2026-06-01T08:30:00Z' }
+    ];
+    MOCK_IMAGES.forEach(function(img, i) {
+      img._mockUrl = 'https://placekitten.com/' + (400 + i * 20) + '/' + (300 + i * 15);
+    });
+
+    const MOCK_CAT_INFO = [
+      { id: 'mock-1', label: '品种', content: '橘白中华田园猫', created_at: '2026-01-01T00:00:00Z' },
+      { id: 'mock-2', label: '性别', content: '男孩子', created_at: '2026-01-01T00:00:00Z' },
+      { id: 'mock-3', label: '出生日期', content: '2026年1月下旬', created_at: '2026-01-01T00:00:00Z' },
+      { id: 'mock-4', label: '性格', content: '温顺亲人，偶尔调皮', created_at: '2026-01-01T00:00:00Z' },
+      { id: 'mock-5', label: '最爱食物', content: '鸡胸肉、猫条', created_at: '2026-01-01T00:00:00Z' }
+    ];
+
+    const MOCK_TIMELINE = [
+      { id: 'mock-t1', event_date: '2026-01-25', title: '来到新家', description: '从救助站接回，刚开始有点害怕，躲在沙发底下', created_at: '2026-01-25T00:00:00Z' },
+      { id: 'mock-t2', event_date: '2026-02-10', title: '第一次体检', description: '身体健康，体重1.8kg，打了第一针疫苗', created_at: '2026-02-10T00:00:00Z' },
+      { id: 'mock-t3', event_date: '2026-03-15', title: '学会用猫砂盆', description: '终于完全掌握了，不再随地大小便', created_at: '2026-03-15T00:00:00Z' },
+      { id: 'mock-t4', event_date: '2026-04-20', title: '第一次洗澡', description: '虽然不太情愿，但还是很乖地配合了', created_at: '2026-04-20T00:00:00Z' },
+      { id: 'mock-t5', event_date: '2026-05-30', title: '体重突破3kg', description: '长得真快，已经是只大猫咪了', created_at: '2026-05-30T00:00:00Z' }
+    ];
+
+    /* =====================================================
+       Supabase 状态机（全局唯一）
+       注意：supabase 必须用 var（与 CDN UMD 的 var supabase 兼容）
+       ===================================================== */
+    var supabase = null;
+    let supabaseStatus = 'init';  // init | sdk-loading | sdk-ready | ready | mock | error
+    let supabaseErrorMsg = '';
+    let supabaseSDKVersion = '';
+    let isMockMode = false;
+
+    /* =====================================================
+       分阶段控制台日志
+       ===================================================== */
+    function logPhase(phase, msg, isError) {
+      const prefix = { init: '🟡', 'sdk-loading': '🔄', 'sdk-ready': '📦', ready: '🟢', mock: '🟠', error: '🔴' }[phase] || '📋';
+      const fn = isError ? console.error : console.log;
+      fn(prefix + ' [' + phase + '] ' + msg);
     }
+
+    /* =====================================================
+       动态加载 Supabase SDK（带重试）
+       ===================================================== */
+    function loadSupabaseSDK(retryCount) {
+      retryCount = retryCount || 0;
+      logPhase('sdk-loading', '第 ' + (retryCount + 1) + '/' + (SDK_MAX_RETRIES + 1) + ' 次尝试加载 CDN...');
+      supabaseStatus = 'sdk-loading';
+
+      return new Promise(function(resolve, reject) {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          logPhase('sdk-ready', 'SDK 已存在于全局，跳过加载');
+          resolve();
+          return;
+        }
+
+        var script = document.createElement('script');
+        script.src = SDK_CDN_URL;
+        var timeoutId = null;
+        var resolved = false;
+
+        function cleanup() {
+          if (timeoutId) clearTimeout(timeoutId);
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        function handleResult(err) {
+          if (resolved) return;
+          resolved = true;
+          cleanup();
+          if (err) reject(err); else resolve();
+        }
+
+        script.onload = function() {
+          if (window.supabase && typeof window.supabase.createClient === 'function') {
+            supabaseSDKVersion = window.supabase.SDK_VERSION || 'unknown';
+            logPhase('sdk-ready', 'SDK 加载成功，版本: ' + supabaseSDKVersion);
+            handleResult();
+          } else {
+            handleResult(new Error('SDK 文件已加载但 window.supabase.createClient 不可用'));
+          }
+        };
+
+        script.onerror = function() {
+          handleResult(new Error('CDN 请求失败: ' + SDK_CDN_URL));
+        };
+
+        timeoutId = setTimeout(function() {
+          handleResult(new Error('SDK 加载超时（' + (SDK_LOAD_TIMEOUT / 1000) + '秒）'));
+        }, SDK_LOAD_TIMEOUT);
+
+        document.head.appendChild(script);
+      }).catch(function(err) {
+        logPhase('sdk-loading', '加载失败: ' + err.message, true);
+        if (retryCount < SDK_MAX_RETRIES) {
+          logPhase('sdk-loading', '将在 2 秒后重试...');
+          return new Promise(function(resolve) {
+            setTimeout(function() {
+              resolve(loadSupabaseSDK(retryCount + 1));
+            }, 2000);
+          });
+        }
+        throw err;
+      });
+    }
+
+    /* =====================================================
+       初始化 Supabase 客户端
+       ===================================================== */
+    function initSupabaseClient() {
+      try {
+        if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.length < 40) {
+          supabaseStatus = 'error';
+          supabaseErrorMsg = 'ANON KEY 格式无效（长度 ' + (SUPABASE_ANON_KEY ? SUPABASE_ANON_KEY.length : 0) + '），请复制完整密钥';
+          logPhase('error', supabaseErrorMsg, true);
+          return false;
+        }
+
+        if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+          supabaseStatus = 'error';
+          supabaseErrorMsg = 'SDK 方法不可用';
+          logPhase('error', supabaseErrorMsg, true);
+          return false;
+        }
+
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: false }
+        });
+
+        supabaseStatus = 'ready';
+        var keyType = SUPABASE_ANON_KEY.startsWith('sb_publishable_') ? 'publishable key（自动 key exchange）' : 'JWT';
+        logPhase('ready', '客户端已创建 | 密钥: ' + keyType + ' | SDK: ' + supabaseSDKVersion);
+        return true;
+      } catch (e) {
+        supabaseStatus = 'error';
+        supabaseErrorMsg = 'createClient 异常: ' + e.message;
+        logPhase('error', supabaseErrorMsg, true);
+        return false;
+      }
+    }
+
+    /* =====================================================
+       连接验证（带超时）
+       ===================================================== */
+    async function verifySupabaseConnection(timeoutMs) {
+      timeoutMs = timeoutMs || 8000;
+      if (!supabase || supabaseStatus !== 'ready') {
+        logPhase('mock', '连接验证跳过：supabase 未就绪');
+        return false;
+      }
+
+      logPhase('ready', '验证表访问...');
+      try {
+        var result = await Promise.race([
+          supabase.from(SITE_CONTENT_TABLE).select('count', { count: 'exact', head: true }),
+          new Promise(function(_, reject) {
+            setTimeout(function() { reject(new Error('验证超时')); }, timeoutMs);
+          })
+        ]);
+
+        if (result.error) {
+          var msg = result.error.message || '';
+          var code = result.error.code || '';
+          logPhase('error', '表查询失败', true);
+          console.error('  详情:', { message: msg, code: code });
+
+          if (msg.includes('Invalid API key') || code === 'PGRST301' || msg.includes('401')) {
+            supabaseErrorMsg = '密钥鉴权失败: ' + msg;
+          } else if (msg.includes('does not exist')) {
+            supabaseErrorMsg = '表不存在: ' + msg;
+          } else {
+            supabaseErrorMsg = '连接验证失败: ' + msg;
+          }
+          return false;
+        }
+
+        logPhase('ready', '表「' + SITE_CONTENT_TABLE + '」可正常访问');
+        return true;
+      } catch (e) {
+        logPhase('error', '连接验证异常: ' + (e.message || '网络错误'), true);
+        supabaseErrorMsg = '连接验证异常: ' + (e.message || '网络错误');
+        return false;
+      }
+    }
+
+    /* =====================================================
+       进入 Mock 降级模式
+       ===================================================== */
+    function enterMockMode(reason) {
+      if (isMockMode) return;
+      isMockMode = true;
+      supabaseStatus = 'mock';
+      logPhase('mock', '进入降级模式 | 原因: ' + (reason || '未知'));
+      if (reason) {
+        showToast('云端不可用，已切换本地模式: ' + reason, 'error');
+      }
+      galleryPhotos = MOCK_IMAGES.slice();
+      catInfoData = MOCK_CAT_INFO.slice();
+      timelineData = MOCK_TIMELINE.slice();
+      siteContent = { ...DEFAULT_CONTENT };
+      renderSiteContent();
+      renderCatInfo();
+      renderTimeline();
+      renderGallery();
+    }
+
+    /* =====================================================
+       主初始化流程：加载 SDK → 创建客户端 → 验证 → 加载数据
+       ===================================================== */
+    async function bootstrapSupabase() {
+      logPhase('init', '=== Supabase 启动 ===');
+      logPhase('init', 'URL: ' + SUPABASE_URL);
+      logPhase('init', 'KEY: ' + SUPABASE_ANON_KEY.substring(0, 20) + '...');
+      logPhase('init', 'Bucket: ' + BUCKET_NAME);
+      logPhase('init', '表: ' + [SITE_CONTENT_TABLE, CAT_INFO_TABLE, TIMELINE_TABLE].join(', '));
+
+      // Step 1: 加载 SDK
+      try {
+        await loadSupabaseSDK(0);
+      } catch (e) {
+        logPhase('error', 'SDK 加载失败（已重试 ' + SDK_MAX_RETRIES + ' 次）', true);
+        enterMockMode('SDK 加载失败');
+        return;
+      }
+
+      // Step 2: 创建客户端
+      if (!initSupabaseClient()) {
+        enterMockMode('客户端创建失败: ' + supabaseErrorMsg);
+        return;
+      }
+
+      // Step 3: 验证连接
+      var verified = await verifySupabaseConnection();
+      if (!verified) {
+        logPhase('mock', '连接验证失败，将使用本地数据');
+        enterMockMode('云端连接失败: ' + supabaseErrorMsg);
+        return;
+      }
+
+      // Step 4: 加载数据
+      logPhase('ready', '开始加载云端数据...');
+      loadAllData();
+    }
+
+    // 启动
+    bootstrapSupabase();
 
     /* =====================================================
        DOM 元素
@@ -1326,6 +1704,7 @@
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
     const exitAdminBtn = document.getElementById('exitAdminBtn');
+    const adminEntryBtn = document.getElementById('adminEntryBtn');
     const editTextBtn = document.getElementById('editTextBtn');
     const uploadBtn = document.getElementById('uploadBtn');
     const fileInput = document.getElementById('fileInput');
@@ -1368,18 +1747,93 @@
     /* =====================================================
        工具函数：Toast 提示
        ===================================================== */
+    function getSupabaseError() {
+      switch (supabaseStatus) {
+        case 'init':         return '正在初始化 Supabase…';
+        case 'sdk-loading':  return '正在加载 Supabase SDK…';
+        case 'sdk-ready':    return 'SDK 已就绪，正在创建客户端…';
+        case 'ready':        return 'Supabase 已连接，但操作失败';
+        case 'mock':         return '本地模式（云端不可用）';
+        case 'error':        return 'Supabase 错误：' + supabaseErrorMsg;
+        default:             return 'Supabase 未连接，请检查配置';
+      }
+    }
+
+    // 统一处理 Supabase 请求错误
+    function handleSupabaseError(err, context) {
+      const msg = (err && err.message) ? err.message : String(err || '未知错误');
+      const code = (err && err.code) ? err.code : '';
+      const details = (err && err.details) ? err.details : '';
+      console.error('❌ [' + (context || 'Supabase') + '] ' + msg, { code: code, details: details });
+
+      // 鉴权相关错误 → 触发降级
+      if (msg.includes('Invalid API key') || code === 'PGRST301' || msg.includes('401') || msg.includes('Unauthorized')) {
+        logPhase('error', '密钥鉴权失败: ' + msg, true);
+        showToast('鉴权失败：ANON KEY 无效，请检查配置', 'error');
+        enterMockMode('密钥鉴权失败');
+        return 'auth';
+      }
+      // JWT 格式错误 → 触发降级
+      if (msg.includes('Invalid Compact JWS') || msg.includes('JWT') || msg.includes('jwt')) {
+        logPhase('error', 'JWT 鉴权失败: ' + msg + ' | SDK: ' + supabaseSDKVersion, true);
+        showToast('JWT 鉴权失败，已切换本地模式', 'error');
+        enterMockMode('JWT 鉴权失败');
+        return 'auth';
+      }
+      // 表不存在 → 触发降级
+      if (msg.includes('relation') && msg.includes('does not exist')) {
+        logPhase('error', '表不存在: ' + msg, true);
+        showToast('表不存在，请执行建表 SQL', 'error');
+        enterMockMode('表不存在');
+        return 'table';
+      }
+      // 存储桶不存在
+      if (msg.includes('Bucket') && (msg.includes('not found') || msg.includes('NotFound'))) {
+        logPhase('error', '存储桶不存在: ' + msg, true);
+        showToast('存储桶「' + BUCKET_NAME + '」不存在，请在 Supabase 后台创建', 'error');
+        return 'bucket';
+      }
+      // 存储 401/400
+      if (msg.includes('400') || msg.includes('storage') || msg.includes('row-level security')) {
+        logPhase('mock', '存储访问失败: ' + msg);
+        showToast('存储访问失败，已切换本地图片', 'error');
+        return 'storage';
+      }
+      // 网络错误
+      if (msg.includes('fetch') || msg.includes('Network') || msg.includes('Failed to fetch')) {
+        showToast('网络请求失败，请检查网络连接', 'error');
+        return 'network';
+      }
+      showToast((context || '操作') + '失败：' + msg, 'error');
+      return 'unknown';
+    }
+
+    // 刷新页面上已渲染的 Supabase 错误信息
+    function refreshErrorMessages() {
+      const msg = getSupabaseError();
+      if (galleryGrid && galleryGrid.querySelector('.gallery-empty') && !supabase && !isMockMode) {
+        galleryGrid.innerHTML = '<div class="gallery-empty">' + msg + '</div>';
+      }
+      if (infoList && !catInfoData.length && !isMockMode) {
+        infoList.innerHTML = '<div style="color:var(--text-light)">' + msg + '</div>';
+      }
+      if (timelineList && !timelineData.length && !isMockMode) {
+        timelineList.innerHTML = '<div style="color:var(--text-light);text-align:center;">' + msg + '</div>';
+      }
+    }
+
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
       toast.className = `toast ${type}`;
       const iconSvg = type === 'success'
-        ? '<svg viewBox="0 0 24 24" fill="none" stroke="#c97f52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
-        : '<svg viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="#C5704A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="#C05A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
       toast.innerHTML = `${iconSvg}<span>${message}</span>`;
       toastContainer.appendChild(toast);
       requestAnimationFrame(() => toast.classList.add('show'));
       setTimeout(() => {
         toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 400);
+        toast.addEventListener('transitionend', () => toast.remove(), { once: true });
       }, 3000);
     }
 
@@ -1482,6 +1936,8 @@
       showToast('已退出管理员模式', 'success');
     });
 
+    adminEntryBtn.addEventListener('click', () => toggleAdmin());
+
     /* =====================================================
        全局文字编辑功能
        ===================================================== */
@@ -1515,23 +1971,35 @@
     }
 
     saveTextBtn.addEventListener('click', async () => {
-      if (!supabase) { showToast('Supabase 未连接，无法保存', 'error'); return; }
+      if (!isAdmin) return;
+      if (isMockMode) { showToast('本地模式不支持保存文字，请先配置 Supabase', 'error'); return; }
+      if (!supabase) { showToast(getSupabaseError(), 'error'); return; }
       const updates = {};
+      let hasEmpty = false;
       document.querySelectorAll('.editable-text').forEach(el => {
         const key = el.dataset.key;
-        if (key) updates[key] = el.innerText.trim();
+        if (key) {
+          const val = el.innerText.trim();
+          if (!val) hasEmpty = true;
+          updates[key] = val;
+        }
       });
+      if (hasEmpty && !confirm('检测到空白字段，空白内容将保存为空。确定继续吗？')) return;
+      saveTextBtn.disabled = true;
+      saveTextBtn.textContent = '保存中…';
       try {
         // 使用 upsert，按 key 冲突时更新
         const rows = Object.entries(updates).map(([key, value]) => ({ key, value }));
         const { error } = await supabase.from(SITE_CONTENT_TABLE).upsert(rows, { onConflict: 'key' });
         if (error) throw error;
         siteContent = { ...siteContent, ...updates };
-        disableTextEdit();
         showToast('文字已保存并同步', 'success');
       } catch (err) {
-        console.error('保存文字失败:', err);
-        showToast('保存失败：' + err.message, 'error');
+        handleSupabaseError(err, '保存文字');
+      } finally {
+        saveTextBtn.disabled = false;
+        saveTextBtn.textContent = '保存修改';
+        disableTextEdit();
       }
     });
 
@@ -1541,18 +2009,23 @@
     });
 
     resetTextBtn.addEventListener('click', async () => {
-      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
-      if (!confirm('确定要恢复默认文字吗？')) return;
+      if (!isAdmin) return;
+      if (isMockMode) { showToast('本地模式不支持恢复文字，请先配置 Supabase', 'error'); return; }
+      if (!supabase) { showToast(getSupabaseError(), 'error'); return; }
+      if (!confirm('确定要恢复为默认文字吗？')) return;
+      resetTextBtn.disabled = true;
       try {
         const rows = Object.entries(DEFAULT_CONTENT).map(([key, value]) => ({ key, value }));
         const { error } = await supabase.from(SITE_CONTENT_TABLE).upsert(rows, { onConflict: 'key' });
         if (error) throw error;
         siteContent = { ...DEFAULT_CONTENT };
         renderSiteContent();
-        disableTextEdit();
         showToast('已恢复默认文字', 'success');
       } catch (err) {
-        showToast('恢复默认失败：' + err.message, 'error');
+        handleSupabaseError(err, '恢复默认文字');
+      } finally {
+        resetTextBtn.disabled = false;
+        disableTextEdit();
       }
     });
 
@@ -1560,6 +2033,7 @@
        数据加载：全局文字
        ===================================================== */
     async function loadSiteContent() {
+      if (isMockMode) { renderSiteContent(); return; }
       if (!supabase) { renderSiteContent(); return; }
       try {
         const { data, error } = await supabase.from(SITE_CONTENT_TABLE).select('*');
@@ -1569,8 +2043,7 @@
         });
         renderSiteContent();
       } catch (err) {
-        console.error('加载站点文字失败:', err);
-        // 使用默认文字继续渲染
+        handleSupabaseError(err, '加载站点文字');
         renderSiteContent();
       }
     }
@@ -1578,7 +2051,7 @@
     function renderSiteContent() {
       document.querySelectorAll('.editable-text').forEach(el => {
         const key = el.dataset.key;
-        if (key && siteContent[key]) {
+        if (key && siteContent[key] !== undefined && siteContent[key] !== null) {
           el.innerText = siteContent[key];
         }
       });
@@ -1588,15 +2061,21 @@
        数据加载：小猫基础信息
        ===================================================== */
     async function loadCatInfo() {
-      if (!supabase) { infoList.innerHTML = '<div style="color:var(--text-light)">Supabase 未连接</div>'; return; }
+      if (isMockMode) { renderCatInfo(); return; }
+      if (!supabase) { infoList.innerHTML = '<div style="color:var(--text-light)">' + getSupabaseError() + '</div>'; return; }
+      infoList.innerHTML = '<div style="color:var(--text-light)">加载中…</div>';
       try {
         const { data, error } = await supabase.from(CAT_INFO_TABLE).select('*').order('created_at', { ascending: true });
         if (error) throw error;
         catInfoData = data || [];
         renderCatInfo();
       } catch (err) {
-        console.error('加载小猫信息失败:', err);
-        infoList.innerHTML = '<div style="color:var(--text-light)">信息加载失败</div>';
+        handleSupabaseError(err, '加载小猫信息');
+        // 降级：使用 mock 数据
+        if (!isMockMode) {
+          catInfoData = MOCK_CAT_INFO.slice();
+          renderCatInfo();
+        }
       }
     }
 
@@ -1637,15 +2116,20 @@
        数据加载：成长时间线
        ===================================================== */
     async function loadTimeline() {
-      if (!supabase) { timelineList.innerHTML = '<div style="color:var(--text-light);text-align:center;">Supabase 未连接</div>'; return; }
+      if (isMockMode) { renderTimeline(); return; }
+      if (!supabase) { timelineList.innerHTML = '<div style="color:var(--text-light);text-align:center;">' + getSupabaseError() + '</div>'; return; }
+      timelineList.innerHTML = '<div style="color:var(--text-light);text-align:center;">加载中…</div>';
       try {
         const { data, error } = await supabase.from(TIMELINE_TABLE).select('*').order('event_date', { ascending: false });
         if (error) throw error;
         timelineData = data || [];
         renderTimeline();
       } catch (err) {
-        console.error('加载成长记录失败:', err);
-        timelineList.innerHTML = '<div style="color:var(--text-light);text-align:center;">时间线加载失败</div>';
+        handleSupabaseError(err, '加载成长时间线');
+        if (!isMockMode) {
+          timelineData = MOCK_TIMELINE.slice();
+          renderTimeline();
+        }
       }
     }
 
@@ -1687,19 +2171,29 @@
        核心：相册（Storage）
        ===================================================== */
     async function loadGallery() {
-      if (!supabase) { galleryGrid.innerHTML = '<div class="gallery-empty">Supabase 未连接，请检查配置。</div>'; return; }
+      if (isMockMode) { renderGallery(); return; }
+      if (!supabase) { galleryGrid.innerHTML = '<div class="gallery-empty">' + getSupabaseError() + '</div>'; return; }
       galleryGrid.innerHTML = '<div class="gallery-loading">正在从云端加载照片…</div>';
       try {
-        const { data, error } = await supabase.storage.from(BUCKET_NAME).list('');
-        if (error) throw error;
-        galleryPhotos = (data || [])
-          .filter(item => item.name && !item.name.startsWith('.emptyFolderPlaceholder'))
-          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        var result = await Promise.race([
+          supabase.storage.from(BUCKET_NAME).list(''),
+          new Promise(function(_, reject) {
+            setTimeout(function() { reject(new Error('加载超时')); }, 10000);
+          })
+        ]);
+        if (result.error) throw result.error;
+        galleryPhotos = (result.data || [])
+          .filter(function(item) { return item.name && !item.name.startsWith('.emptyFolderPlaceholder'); })
+          .sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); });
         renderGallery();
       } catch (err) {
-        console.error('加载相册失败:', err);
-        galleryGrid.innerHTML = '<div class="gallery-empty">加载失败，请检查 Supabase 配置与存储桶权限。</div>';
-        showToast('相册加载失败：' + err.message, 'error');
+        handleSupabaseError(err, '加载相册');
+        // 存储失败 → 降级为 mock 图片
+        if (!isMockMode) {
+          logPhase('mock', '相册加载失败，使用本地图片');
+          galleryPhotos = MOCK_IMAGES.slice();
+          renderGallery();
+        }
       }
     }
 
@@ -1709,10 +2203,22 @@
         galleryGrid.innerHTML = '<div class="gallery-empty">相册还是空的，管理员可点击右上角上传。</div>';
         return;
       }
-      galleryPhotos.forEach((file, index) => {
-        const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(file.name);
-        const url = data.publicUrl;
-        const card = document.createElement('div');
+      galleryPhotos.forEach(function(file, index) {
+        // 获取图片 URL：mock 模式使用占位图，正常模式使用 Supabase 公开 URL
+        var url;
+        if (file._mockUrl) {
+          url = file._mockUrl;
+        } else if (supabase && supabase.storage) {
+          try {
+            var publicUrlResult = supabase.storage.from(BUCKET_NAME).getPublicUrl(file.name);
+            url = publicUrlResult.data.publicUrl;
+          } catch (e) {
+            url = 'https://placekitten.com/400/300';
+          }
+        } else {
+          url = 'https://placekitten.com/400/300';
+        }
+        var card = document.createElement('div');
         card.className = 'photo-card';
         card.setAttribute('data-index', index);
         card.innerHTML = `
@@ -1757,21 +2263,27 @@
       }
     }
 
-    uploadBtn.addEventListener('click', () => fileInput.click());
+    uploadBtn.addEventListener('click', () => {
+      if (!isAdmin) return;
+      if (isMockMode) { showToast('本地模式不支持上传，请先配置 Supabase', 'error'); return; }
+      fileInput.click();
+    });
 
     fileInput.addEventListener('change', async (e) => {
-      if (!supabase) { showToast('Supabase 未连接，无法上传', 'error'); return; }
+      if (!isAdmin) return;
+      if (isMockMode) { showToast('本地模式不支持上传，请先配置 Supabase', 'error'); return; }
+      if (!supabase) { showToast(getSupabaseError(), 'error'); return; }
       const files = Array.from(e.target.files);
       if (files.length === 0) return;
       const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
       for (const file of files) {
         if (!validTypes.includes(file.type)) {
-          showToast(`不支持的格式：${file.name}`, 'error');
-          return;
+          showToast('不支持的格式：' + file.name, 'error');
+          fileInput.value = ''; return;
         }
         if (file.size > MAX_FILE_SIZE) {
-          showToast(`文件过大：${file.name}（最大 10MB）`, 'error');
-          return;
+          showToast('文件过大：' + file.name + '（最大 10MB）', 'error');
+          fileInput.value = ''; return;
         }
       }
       uploadProgress.style.display = 'block';
@@ -1783,22 +2295,21 @@
         for (const file of files) {
           const compressed = await compressImage(file);
           const ext = file.name.split('.').pop() || 'jpg';
-          const fileName = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
-          // 上传文件（不依赖 onUploadProgress，用文件完成数来显示进度）
+          const fileName = Date.now() + '_' + Math.random().toString(36).slice(2, 8) + '.' + ext;
           const { error } = await supabase.storage.from(BUCKET_NAME).upload(fileName, compressed, {
             cacheControl: '3600',
             upsert: false
           });
           if (error) throw error;
           completed++;
-          progressBar.style.width = `${Math.round((completed / files.length) * 100)}%`;
+          progressBar.style.width = Math.round((completed / files.length) * 100) + '%';
         }
-        showToast(`成功上传 ${files.length} 张照片`, 'success');
-        fileInput.value = '';
+        showToast('成功上传 ' + files.length + ' 张照片', 'success');
         await loadGallery();
       } catch (err) {
-        showToast('上传失败：' + err.message, 'error');
+        handleSupabaseError(err, '上传照片');
       } finally {
+        fileInput.value = '';
         uploadProgress.style.display = 'none';
         progressBar.style.width = '0%';
         uploadBtn.disabled = false;
@@ -1807,7 +2318,9 @@
     });
 
     async function deletePhoto(fileName) {
-      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
+      if (!isAdmin) return;
+      if (isMockMode) { showToast('本地模式不支持删除', 'error'); return; }
+      if (!supabase) { showToast(getSupabaseError(), 'error'); return; }
       if (!confirm('确定要删除这张照片吗？')) return;
       try {
         const { error } = await supabase.storage.from(BUCKET_NAME).remove([fileName]);
@@ -1815,15 +2328,15 @@
         showToast('照片已删除', 'success');
         await loadGallery();
       } catch (err) {
-        showToast('删除失败：' + err.message, 'error');
+        handleSupabaseError(err, '删除照片');
       }
     }
 
     /* =====================================================
        弹窗：小猫信息 / 成长时间线
        ===================================================== */
-    addInfoBtn.addEventListener('click', () => openInfoModal());
-    addTimelineBtn.addEventListener('click', () => openTimelineModal());
+    addInfoBtn.addEventListener('click', () => { if (!isAdmin) return; if (isMockMode) { showToast('本地模式不支持添加，请先配置 Supabase', 'error'); return; } openInfoModal(); });
+    addTimelineBtn.addEventListener('click', () => { if (!isAdmin) return; if (isMockMode) { showToast('本地模式不支持添加，请先配置 Supabase', 'error'); return; } openTimelineModal(); });
     modalCancel.addEventListener('click', closeModal);
     modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
     modalSave.addEventListener('click', saveModal);
@@ -1831,8 +2344,15 @@
     function openModal(title, htmlBody) {
       modalTitle.textContent = title;
       modalBody.innerHTML = htmlBody;
+      // 保存打开前的焦点，用于关闭后恢复
+      modalOverlay._previousFocus = document.activeElement;
       modalOverlay.classList.add('active');
       document.body.style.overflow = 'hidden';  // 锁定背景滚动
+      // 焦点移到弹窗内第一个可聚焦元素
+      requestAnimationFrame(() => {
+        const firstFocusable = modal.querySelector('input, button, textarea, [tabindex]:not([tabindex="-1"])');
+        if (firstFocusable) firstFocusable.focus();
+      });
     }
 
     function closeModal() {
@@ -1840,14 +2360,37 @@
       modalMode = null;
       modalEditingId = null;
       document.body.style.overflow = '';  // 恢复背景滚动
+      // 恢复焦点到打开弹窗前的元素
+      if (modalOverlay._previousFocus) {
+        modalOverlay._previousFocus.focus();
+        modalOverlay._previousFocus = null;
+      }
     }
+
+    // 弹窗焦点陷阱：Tab 键在弹窗内循环
+    modal.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || !modalOverlay.classList.contains('active')) return;
+      const focusable = modal.querySelectorAll(
+        'input:not([disabled]), button:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
 
     function openInfoModal(id = null) {
       modalMode = id ? 'edit-info' : 'add-info';
       modalEditingId = id;
       let item = { label: '', content: '' };
       if (id) {
-        item = catInfoData.find(i => i.id == id) || item;
+        item = catInfoData.find(i => i.id === id) || item;
       }
       openModal(id ? '编辑信息' : '添加信息', `
         <div class="form-group"><label>信息标签</label><input type="text" id="infoLabel" value="${escapeHtml(item.label)}" placeholder="例如：体重"></div>
@@ -1860,22 +2403,26 @@
       modalEditingId = id;
       let item = { event_date: '', title: '', description: '' };
       if (id) {
-        item = timelineData.find(i => i.id == id) || item;
+        item = timelineData.find(i => i.id === id) || item;
       }
       openModal(id ? '编辑成长节点' : '添加成长节点', `
-        <div class="form-group"><label>日期</label><input type="date" id="timelineDate" value="${item.event_date || ''}"></div>
+        <div class="form-group"><label>日期</label><input type="date" id="timelineDate" value="${item.event_date || ''}" max="${new Date().toISOString().split('T')[0]}"></div>
         <div class="form-group"><label>标题</label><input type="text" id="timelineTitle" value="${escapeHtml(item.title)}" placeholder="例如：第一次打疫苗"></div>
         <div class="form-group"><label>描述</label><textarea id="timelineDesc" placeholder="简短描述这一刻">${escapeHtml(item.description || '')}</textarea></div>
       `);
     }
 
     async function saveModal() {
-      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
+      if (!isAdmin) return;
+      if (isMockMode) { showToast('本地模式不支持保存，请先配置 Supabase', 'error'); return; }
+      if (!supabase) { showToast(getSupabaseError(), 'error'); return; }
       try {
         if (modalMode === 'add-info' || modalMode === 'edit-info') {
           const label = document.getElementById('infoLabel').value.trim();
           const content = document.getElementById('infoContent').value.trim();
           if (!label || !content) { showToast('请填写完整信息', 'error'); return; }
+          modalSave.disabled = true;
+          modalSave.textContent = '保存中…';
           const payload = { label, content };
           if (modalMode === 'edit-info') {
             const { error } = await supabase.from(CAT_INFO_TABLE).update(payload).eq('id', modalEditingId);
@@ -1892,6 +2439,8 @@
           const title = document.getElementById('timelineTitle').value.trim();
           const description = document.getElementById('timelineDesc').value.trim();
           if (!event_date || !title) { showToast('请填写日期和标题', 'error'); return; }
+          modalSave.disabled = true;
+          modalSave.textContent = '保存中…';
           const payload = { event_date, title, description };
           if (modalMode === 'edit-timeline') {
             const { error } = await supabase.from(TIMELINE_TABLE).update(payload).eq('id', modalEditingId);
@@ -1905,13 +2454,17 @@
         }
         closeModal();
       } catch (err) {
-        console.error('保存失败:', err);
-        showToast('保存失败：' + err.message, 'error');
+        handleSupabaseError(err, modalMode.includes('info') ? '保存信息' : '保存时间线');
+      } finally {
+        modalSave.disabled = false;
+        modalSave.textContent = '保存';
       }
     }
 
     async function deleteCatInfo(id) {
-      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
+      if (!isAdmin) return;
+      if (isMockMode) { showToast('本地模式不支持删除', 'error'); return; }
+      if (!supabase) { showToast(getSupabaseError(), 'error'); return; }
       if (!confirm('确定要删除这条信息吗？')) return;
       try {
         const { error } = await supabase.from(CAT_INFO_TABLE).delete().eq('id', id);
@@ -1919,20 +2472,22 @@
         showToast('信息已删除', 'success');
         await loadCatInfo();
       } catch (err) {
-        showToast('删除失败：' + err.message, 'error');
+        handleSupabaseError(err, '删除信息');
       }
     }
 
     async function deleteTimeline(id) {
-      if (!supabase) { showToast('Supabase 未连接', 'error'); return; }
-      if (!confirm('确定要删除这条成长记录吗？')) return;
+      if (!isAdmin) return;
+      if (isMockMode) { showToast('本地模式不支持删除', 'error'); return; }
+      if (!supabase) { showToast(getSupabaseError(), 'error'); return; }
+      if (!confirm('确定要删除这条记录吗？')) return;
       try {
         const { error } = await supabase.from(TIMELINE_TABLE).delete().eq('id', id);
         if (error) throw error;
         showToast('记录已删除', 'success');
         await loadTimeline();
       } catch (err) {
-        showToast('删除失败：' + err.message, 'error');
+        handleSupabaseError(err, '删除时间线');
       }
     }
 
@@ -1953,12 +2508,23 @@
       }
     }
     function updateLightbox() {
-      if (!supabase || !galleryPhotos.length) return;
+      if (!galleryPhotos.length) return;
       const file = galleryPhotos[currentLightboxIndex];
       if (!file) return;
-      const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(file.name);
-      lightboxImg.src = data.publicUrl;
-      lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${galleryPhotos.length}`;
+      // mock 模式：使用占位图 URL
+      if (file._mockUrl) {
+        lightboxImg.src = file._mockUrl;
+      } else if (supabase && supabase.storage) {
+        try {
+          const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(file.name);
+          lightboxImg.src = data.publicUrl;
+        } catch (e) {
+          lightboxImg.src = 'https://placekitten.com/400/300';
+        }
+      } else {
+        lightboxImg.src = 'https://placekitten.com/400/300';
+      }
+      lightboxCounter.textContent = (currentLightboxIndex + 1) + ' / ' + galleryPhotos.length;
     }
     function prevImage() {
       currentLightboxIndex = (currentLightboxIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
@@ -1991,13 +2557,24 @@
     /* =====================================================
        导航栏滚动毛玻璃 & 移动端汉堡菜单
        ===================================================== */
-    // 导航栏滚动毛玻璃效果（requestAnimationFrame 节流）
+    // 导航栏滚动毛玻璃效果 + 当前区块高亮（requestAnimationFrame 节流）
     let scrollTicking = false;
+    const sections = document.querySelectorAll('section[id]');
     window.addEventListener('scroll', () => {
       if (!scrollTicking) {
         requestAnimationFrame(() => {
+          // 毛玻璃效果
           if (window.scrollY > 30) navbar.classList.add('scrolled');
           else navbar.classList.remove('scrolled');
+          // 高亮当前区块对应的导航链接
+          let current = '';
+          sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+          });
+          navLinks.querySelectorAll('a').forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === `#${current}`);
+          });
           scrollTicking = false;
         });
         scrollTicking = true;
@@ -2043,11 +2620,44 @@
     /* =====================================================
        页面初始化
        ===================================================== */
-    document.addEventListener('DOMContentLoaded', () => {
+    function loadAllData() {
+      // mock 模式：直接渲染本地数据
+      if (isMockMode) {
+        renderSiteContent();
+        renderCatInfo();
+        renderTimeline();
+        renderGallery();
+        return;
+      }
+      // supabase 未就绪：渲染默认内容 + 占位
+      if (!supabase || supabaseStatus !== 'ready') {
+        renderSiteContent();
+        if (galleryGrid && !galleryGrid.children.length) {
+          galleryGrid.innerHTML = '<div class="gallery-empty">' + getSupabaseError() + '</div>';
+        }
+        if (infoList && !infoList.children.length) {
+          infoList.innerHTML = '<div style="color:var(--text-light)">' + getSupabaseError() + '</div>';
+        }
+        if (timelineList && !timelineList.children.length) {
+          timelineList.innerHTML = '<div style="color:var(--text-light);text-align:center;">' + getSupabaseError() + '</div>';
+        }
+        return;
+      }
       loadSiteContent();
       loadCatInfo();
       loadTimeline();
       loadGallery();
+    }
+
+    // DOMContentLoaded 仅用于日志输出，实际加载由 bootstrapSupabase 驱动
+    document.addEventListener('DOMContentLoaded', function() {
+      logPhase('init', 'DOMContentLoaded | supabaseStatus: ' + supabaseStatus + ' | isMockMode: ' + isMockMode);
+      if (isMockMode) {
+        renderSiteContent();
+        renderCatInfo();
+        renderTimeline();
+        renderGallery();
+      }
     });
   </script>
 </body>
